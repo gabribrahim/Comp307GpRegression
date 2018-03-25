@@ -9,11 +9,8 @@ import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
-import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.AccessibleRole;
-import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
@@ -27,7 +24,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import model.DataSetsLoader;
 import model.KnnClassifier;
@@ -43,6 +39,7 @@ public class MainController {
 	private Main main;
 	private DataSetsLoader myDataLoader = new DataSetsLoader();
 	
+	public HashMap<String,XYChart.Series<Number,Number>> chartSeries = new HashMap<>();
 	public ScatterChart<Number,Number> scatterChart ;
 	public List<String> featuresList = new ArrayList<String>();
 	public String xAxisFeature; 
@@ -74,64 +71,95 @@ public class MainController {
 	}
 	
 
-	public void computeKnn2() {
-		StatusTA.setText("");
-		myDataLoader.myclassifier	= new KnnClassifier(myDataLoader);
-		myDataLoader.myclassifier.knnNumber		= Integer.parseInt(KnnTF.getText());
-		LabelledDataInstance testInstance = myDataLoader.testDataSetList.get(74);
-		myDataLoader.myclassifier.predictClassForTestInstance(testInstance);
-	}
-	public void computeKnn() {
-		StatusTA.setText("");
+	public void saveCharts() {
+		//This Functions will save a chart for the current KNN used in the UI
+		// With the X-Axis & Y-Axis Combinations below.
+		xAxisFeature 										= "Petal Width";
+		yAxisFeature										= "Sepal Width";
+		saveChartForFeatureCombination();
+		xAxisFeature 										= "Petal Length";
+		yAxisFeature										= "Sepal Width";
+		saveChartForFeatureCombination();	
+		xAxisFeature 										= "Petal Length";
+		yAxisFeature										= "Sepal Length";
+		saveChartForFeatureCombination();
+		xAxisFeature 										= "Petal Width";
+		yAxisFeature										= "Sepal Length";
+		saveChartForFeatureCombination();
+		xAxisFeature 										= "Petal Length";
+		yAxisFeature										= "Petal Width";
+		saveChartForFeatureCombination();				
+		xAxisFeature 										= "Sepal Length";
+		yAxisFeature										= "Petal Width";
+		saveChartForFeatureCombination();				
 		
-		myDataLoader.myclassifier 							= new KnnClassifier(myDataLoader);
-		myDataLoader.myclassifier.knnNumber					= Integer.parseInt(KnnTF.getText());		
-		XYChart.Series<Number, Number> correctPredictions 	= scatterChart.getData().get(3);
-		XYChart.Series<Number, Number> wrongPredictions 	= scatterChart.getData().get(4);
-		correctPredictions.getData().clear();
-		wrongPredictions.getData().clear();
+	}
 
+
+	private void saveChartForFeatureCombination() {
+		scatterChart.getData().clear();
+		myDataLoader.clear();		
+		LoadIrisDataSet();
+		myDataLoader.myclassifier 							= new KnnClassifier(myDataLoader);
+		myDataLoader.myclassifier.knnNumber					= Integer.parseInt(KnnTF.getText()); // Get KNN Value from UI	
+		computeKnn();
+		saveSnapShot();
+	}
+	
+	public void computeKnn() {
+		//Clearing the Status TextArea
+		StatusTA.setText("");
+		scatterChart.getData().clear();
+		plotIrisTrainingSetOnChart(xAxisFeature, yAxisFeature);
+		// Assigning KNN to Data Set Classifier
+		myDataLoader.myclassifier 							= new KnnClassifier(myDataLoader);
+		myDataLoader.myclassifier.knnNumber					= Integer.parseInt(KnnTF.getText()); // Get KNN Value from UI
+		chartSeries.get("WrongPredictions").getData().clear();
+
+		// Initializing Variables for accuracy calculation Later on
 		int count					= 1;
 		int correctPrediction		= 0;		
 		int trainingInstancesCount	= myDataLoader.trainingDataSetList.size();
 		for (LabelledDataInstance testInstance : myDataLoader.testDataSetList) {
+			// getting X & Y values based on current Axis Features Selected
 			float testXfeature		= testInstance.featureListAsValues.get(featuresList.indexOf(xAxisFeature));
 			float testYfeature		= testInstance.featureListAsValues.get(featuresList.indexOf(yAxisFeature));
 			
-			
+			// Compute the KNN
 			String predictedClass	= myDataLoader.myclassifier.predictClassForTestInstance(testInstance);
-			testInstance.predictedClass = predictedClass;
+			testInstance.predictedClass = predictedClass;			
+			
 			if (predictedClass.equals(testInstance.labelName)) {
-//				StatusTA.appendText("Sucess!! TestID:"+count+" Label="+testInstance.labelName
-//									+" Prediction="+predictedClass+"\n");
 				correctPrediction++;
-				correctPredictions.getData().add(new Data<Number,Number>(testXfeature,testYfeature));
+				chartSeries.get(testInstance.labelName).getData().add(new Data<Number,Number>(testXfeature,testYfeature));
 				}
 			else{
 				StatusTA.appendText("FAIL! TestID:"+count+" "+testInstance.labelName
 						+"!="+predictedClass+"\n");
-				wrongPredictions.getData().add(new Data<Number,Number>(testXfeature,testYfeature));
+				chartSeries.get("WrongPredictions").getData().add(new Data<Number,Number>(testXfeature,testYfeature));
 			}
-//			saveAsPng("TestInstance_" + count);
-			
-//			testSeries.getData().clear();
-			
 			count++;
 		}
-		myDataLoader.myclassifier.accuracy					= ((double)correctPrediction/(double)trainingInstancesCount)*100.0;
-				
+		// Calculating Accuracy measure
+		myDataLoader.myclassifier.accuracy					= ((double)correctPrediction/(double)trainingInstancesCount)*100.0;				
 		StatusTA.appendText("Accuracy @K" + myDataLoader.myclassifier.knnNumber + "NN="+myDataLoader.myclassifier.accuracy) ;
 		scatterChart.setTitle(myDataLoader.myclassifier.knnNumber + "NN Accuracy =" + myDataLoader.myclassifier.accuracy);
 	}
+	
 	public void LoadIrisDataSet() {
 		System.out.println("Loading IrisDataset");
 		myDataLoader.dataSetName = "Iris Dataset";
-		myDataLoader.loadIrisDataSet("src/model/iris-training.txt",myDataLoader.trainingDataSetList);		
+		myDataLoader.clear();
+//						
+//		System.out.println(System.getProperty("user.dir").replace('\\', '/') + "/iris-training.txt");
+//		System.out.println(getClass().getResource("iris-training.txt").getPath());
+		myDataLoader.loadIrisDataSet(System.getProperty("user.dir").replace('\\', '/') + "/iris-training.txt",myDataLoader.trainingDataSetList);		
 		myDataLoader.computeRangeForFeaturesInDataSet();
 		StatusTA.setText(myDataLoader.toString());
-		myDataLoader.loadIrisDataSet("src/model/iris-test.txt",myDataLoader.testDataSetList);
+		myDataLoader.loadIrisDataSet(System.getProperty("user.dir").replace('\\', '/') + "/iris-test.txt",myDataLoader.testDataSetList);
 		StatusTA.appendText("Test Data Set Size = " + myDataLoader.testDataSetList.size());
 		MainLabel.setText("Iris DataSet Loaded");
+		scatterChart.getData().clear();
 		plotIrisTrainingSetOnChart(xAxisFeature,yAxisFeature);
 //		System.out.println(this.MainLabel);
 	}
@@ -183,19 +211,19 @@ public class MainController {
 	
 	
 	public void plotIrisTrainingSetOnChart(String xAxisFeature, String yAxisFeature) {
-		for (String dataSetClass : myDataLoader.dataSetClasses) {
+		// Pragmatically Adding TheLabels of The Data Set as Chart Series Key = String Value = XYChart.Series
+		// Later On Referenced for Plotting Correct & Wrong Predictions
+		for (String classLabel : myDataLoader.dataSetClasses) {
+			XYChart.Series<Number,Number> newSeries	= new XYChart.Series<>();
+			newSeries.setName(classLabel);
+			chartSeries.put(classLabel, newSeries);
+			newSeries.getData().add(new Data<Number,Number>(0,0)); //TODO Look into bug where Icons don't show for empty series
+			scatterChart.getData().add(newSeries);
 			
 		}
-		XYChart.Series<Number,Number> setosa	= new XYChart.Series<>();		
-		XYChart.Series<Number,Number> virginica = new XYChart.Series<>();
-		XYChart.Series<Number,Number> versicolor= new XYChart.Series<>();
-		XYChart.Series<Number,Number> correctPredictions	= new XYChart.Series<>();
-		XYChart.Series<Number,Number> wrongPredictions		= new XYChart.Series<>();
-		correctPredictions.setName("Correct Predictions");	
-		wrongPredictions.setName("Wrong Predictions");	
-		versicolor.setName("Versicolor");
-		virginica.setName("Virginica");
-		setosa.setName("Setosa");
+		
+		// Creating a HashMap For FeatureList Manually as Data did not have a header row
+		// Later On Used in changeAxisFeature to allow user to plot relationships between different features of the dataSet
 		HashMap<String,Integer> axisOptions		= new HashMap<String,Integer>();
 		axisOptions.put("Petal Length", 0);
 		axisOptions.put("Petal Width", 1);
@@ -206,33 +234,24 @@ public class MainController {
 		int yAxisFeatureIndex					= axisOptions.get(yAxisFeature);
 		
 		
-		// 5 attributes - Petal Length , Petal Width , Sepal Length , Sepal width
-		System.out.println( "Training Data Set"+myDataLoader.trainingDataSetList.size());
-		for (LabelledDataInstance dataInstance : myDataLoader.trainingDataSetList) {			
-			if (dataInstance.labelName.equals("Iris-versicolor")){				
-				float floatx = dataInstance.featureListAsValues.get(xAxisFeatureIndex);
-				float floaty = dataInstance.featureListAsValues.get(yAxisFeatureIndex);
-				versicolor.getData().add(new Data<Number,Number>(floatx,floaty));
-			}
-			if (dataInstance.labelName.equals("Iris-virginica")){				
-				float floatx = dataInstance.featureListAsValues.get(xAxisFeatureIndex);
-				float floaty = dataInstance.featureListAsValues.get(yAxisFeatureIndex);
-				virginica.getData().add(new Data<Number,Number>(floatx,floaty));
-			}			
-			if (dataInstance.labelName.equals("Iris-setosa")){				
-				float floatx = dataInstance.featureListAsValues.get(xAxisFeatureIndex);
-				float floaty = dataInstance.featureListAsValues.get(yAxisFeatureIndex);
-				setosa.getData().add(new Data<Number,Number>(floatx,floaty));
-			}			
-			
+		// 5 attributes - Petal Length , Petal Width , Sepal Length , Sepal width , Class Label
+		// ForLoop Below allows me to get the XYChart.Series Obj based on the dataInstance.labelName
+		// Plot the dataInstance leaving everything flexible for other data sets in the future
+		System.out.println( "Training Data Set "+myDataLoader.trainingDataSetList.size());
+		for (LabelledDataInstance dataInstance : myDataLoader.trainingDataSetList) {
+			float floatx = dataInstance.featureListAsValues.get(xAxisFeatureIndex);
+			float floaty = dataInstance.featureListAsValues.get(yAxisFeatureIndex);			
+			chartSeries.get(dataInstance.labelName).getData().add(new Data<Number,Number>(floatx,floaty));
 		}
-		correctPredictions.getData().add(new Data<Number,Number>(0,0));
+		// Adding One Last Series To The Chart for Wrong Predictions
+		XYChart.Series<Number,Number> wrongPredictions	= new XYChart.Series<>();
 		wrongPredictions.getData().add(new Data<Number,Number>(0,0));
-		scatterChart.getData().add(versicolor);
-		scatterChart.getData().add(virginica);
-		scatterChart.getData().add(setosa);
-		scatterChart.getData().add(correctPredictions);
+		wrongPredictions.setName("Wrong Predictions");
+		chartSeries.put("WrongPredictions",wrongPredictions);
 		scatterChart.getData().add(wrongPredictions);
+		
+		
+		// Setting Axis Labels provided by the function input from changeAxisFeature
 		scatterChart.getXAxis().setLabel(xAxisFeature);
 		scatterChart.getYAxis().setLabel(yAxisFeature);
 		

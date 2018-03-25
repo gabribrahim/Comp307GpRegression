@@ -103,7 +103,7 @@
                   <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="240.0" text="Generate Test Instance" />
                   <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="240.0" text="Classify Test Instance" />
                   <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="240.0" text="Cluster By K-Means" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#saveSnapShot" prefHeight="39.0" prefWidth="240.0" text="Save Chart To PNG" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#saveCharts" prefHeight="39.0" prefWidth="240.0" text="Save Charts To PNG" />
                   <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="240.0" text="Change Training/Test Ratio" />
                   <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="200.0" prefWidth="275.0" VBox.vgrow="ALWAYS" />
                </children>

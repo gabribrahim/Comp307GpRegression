@@ -32,6 +32,13 @@ public class DataSetsLoader {
 	}
 
 	
+	public void clear() {
+		this.trainingDataSetList.clear();
+		this.testDataSetList.clear();
+		this.minValuesForFeatures.clear();
+		this.maxValuesForFeatures.clear();
+	}
+	
 	
 	public void computeRangeForFeaturesInDataSet() {
 		// Fill Minimum & Max Values For Features with Zero Lists Matching Count of Features

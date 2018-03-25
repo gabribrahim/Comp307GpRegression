@@ -17,26 +17,41 @@
 -fx-background-color:
 linear-gradient(to bottom, derive(-fx-base,+50%), derive(-fx-base,-40%), derive(-fx-base,-20%));
 }
-
+/*
 .chart-symbol {
     -fx-background-radius: 5;
     -fx-padding: 2px ;
 }
+  */
  
-.default-color2.chart-symbol { 
-    -fx-background-color: rgb(0,100,220);
+  .default-color0.chart-symbol { /*versicolor */
+    -fx-background-color: rgb(243,98,45);
+    -fx-background-radius: 5;
+    -fx-padding: 2px ;    
  
     } 
-.default-color3.chart-symbol { 
-    -fx-background-color: rgb(0,255,0);
+ .default-color1.chart-symbol { /*virginica */
+    -fx-background-color: rgb(251,167,27);
+    -fx-background-radius: 5;
+    -fx-padding: 2px ;    
  
+    } 
+     
+.default-color2.chart-symbol { /*setosa */
+    -fx-background-color: rgb(0,100,220);
+    -fx-background-radius: 5;
+    -fx-padding: 2px ;    
+ 
+    } 
+.default-color3.chart-symbol { /*Wrong Predictions */
+    -fx-background-color: rgb(255,0,0);     
+    -fx-background-radius: 5;
+    -fx-padding: 3px ;
+    -fx-background-insets: 0;
+    -fx-shape: "M2,0 L5,4 L8,0 L10,0 L10,2 L6,5 L10,8 L10,10 L8,10 L5,6 L2,
+    10 L0,10 L0,8 L4,5 L0,2 L0,0 Z";
     }
   
-.default-color4.chart-symbol { 
-    -fx-background-color: rgb(255,0,0);
- 
-    }
-
 .split-pane:horizontal > * > .split-pane-divider {
 -fx-border-color: transparent -fx-base transparent -fx-base;
 -fx-background-color: transparent, derive(-fx-base,20%);
