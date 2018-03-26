@@ -20,7 +20,7 @@ public class Main extends Application {
 	public void MainWindow(){
 		
 		try {
-			FXMLLoader loader 	= new FXMLLoader(Main.class.getResource("KnnView.fxml"));
+			FXMLLoader loader 	= new FXMLLoader(Main.class.getResource("dtView.fxml"));
 			AnchorPane pane 	= loader.load();
 			MainController mainWinController = loader.getController();
 			mainWinController.setMain(this);

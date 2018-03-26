@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="RootAP" prefHeight="571.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
+   <children>
+      <Region id="LoadIrisBTN" layoutX="150.0" layoutY="6.0" prefHeight="64.0" prefWidth="1004.0" AnchorPane.bottomAnchor="470.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="6.0">
+         <effect>
+            <Lighting specularExponent="17.97">
+               <bumpInput>
+                  <DropShadow />
+               </bumpInput>
+               <light>
+                  <Light.Distant color="#4a3e3e" />
+               </light>
+            </Lighting>
+         </effect>
+      </Region>
+      <Label id="MainLabel" fx:id="MainLabel" layoutX="17.0" layoutY="1.0" prefHeight="64.0" prefWidth="1004.0" text="Assignment 1 Question 2" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <font>
+            <Font name="Andalus" size="29.0" />
+         </font>
+      </Label>
+      <VBox layoutX="40.0" layoutY="527.0" prefHeight="39.0" prefWidth="1004.0" spacing="7.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="39.0" prefWidth="1024.0">
+               <children>
+                  <Label prefHeight="38.0" text="Geni Impurity Threshold :.">
+                     <padding>
+                        <Insets left="10.0" right="10.0" />
+                     </padding>
+                  </Label>
+                  <TextField id="KnnTF" fx:id="KnnTF" text="3" />
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+         </children>
+      </VBox>
+      <HBox id="ChartBox" fx:id="ChartBox" layoutX="11.0" layoutY="49.0" maxWidth="-Infinity" prefHeight="457.0" prefWidth="1004.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="49.0">
+         <children>
+            <VBox prefHeight="200.0" prefWidth="275.0">
+               <children>
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="39.0" prefWidth="275.0" text="Load Hepatitis Data Set" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="275.0" text="Build Tree" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="275.0" text="Change Training/Test Ratio" />
+                  <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="200.0" prefWidth="275.0" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

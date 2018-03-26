@@ -7,7 +7,7 @@ import java.util.List;
 public class LabelledDataInstance implements Comparable<LabelledDataInstance>{
 	public List<String> featuresListAsStrings;
 	public String labelName;
-	public ArrayList<Float> featureListAsValues;
+	public ArrayList<Boolean> featureListAsValues;
 	public double euclideanNormalisedDistance = 0.0 ;
 	public String predictedClass;
 	public LabelledDataInstance(List<String> featuresList, String labelName) {	
@@ -20,13 +20,13 @@ public class LabelledDataInstance implements Comparable<LabelledDataInstance>{
 	@Override
 	public String toString() {
 		return "LabelledDataInstance [labelName=" + labelName + ", featureListAsValues=" + featureListAsValues + " "
-				+ "Distance= "+euclideanNormalisedDistance +"]";
+				+ "AttrsCount= "+featureListAsValues.size()+"]";
 	}
 
 	public void parseInformationToValues() {
-		featureListAsValues					= new ArrayList<Float>();
+		featureListAsValues					= new ArrayList<Boolean>();
 		for (String string : featuresListAsStrings) {
-			featureListAsValues.add(Float.parseFloat(string));
+			featureListAsValues.add(Boolean.parseBoolean(string));
 		}
 	}
 
