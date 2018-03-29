@@ -3,6 +3,7 @@
 	<name>Comp307DT</name>
 	<comment></comment>
 	<projects>
+		<project>Prefuse-master.zip_expanded</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

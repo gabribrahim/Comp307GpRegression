@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.embed.swing.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.effect.*?>
@@ -46,14 +48,17 @@
       </VBox>
       <HBox id="ChartBox" fx:id="ChartBox" layoutX="11.0" layoutY="49.0" maxWidth="-Infinity" prefHeight="457.0" prefWidth="1004.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="49.0">
          <children>
-            <VBox prefHeight="200.0" prefWidth="275.0">
+            <VBox prefHeight="457.0" prefWidth="507.0">
                <children>
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="39.0" prefWidth="275.0" text="Load Hepatitis Data Set" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="275.0" text="Build Tree" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="275.0" text="Change Training/Test Ratio" />
-                  <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="200.0" prefWidth="275.0" VBox.vgrow="ALWAYS" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="39.0" prefWidth="755.0" text="Load Hepatitis Data Set" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="755.0" text="Build Tree" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="755.0" text="Fit View To Tree Nodes" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="755.0" text="Expand/Collapse All Nodes" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="755.0" text="Change Training/Test Ratio" />
+                  <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="457.0" prefWidth="755.0" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
+            <SwingNode fx:id="TreeP" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
    </children>
