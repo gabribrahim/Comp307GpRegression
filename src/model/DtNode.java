@@ -18,14 +18,17 @@ public class DtNode {
 	ArrayList<String> attrsList;
 	ArrayList<String> originalAttrslist;
 	String bestAttr     						  	= "";
-	
+	String attributeToSplitOn						= "";
+	Node visualRepNode;
 	
 	public String getBestAttr() {
+		
 		if (isPure()) {
-			return containedInstances.get(0).labelName;
+			return containedInstances.get(0).labelName + "\n"+computeNodeProbabilities();
 		}
 		if (bestAttr.equals("")){return nodeName;}
-		return  bestAttr +"\n" + instancesTrue.size() + "<>" + instancesFalse.size();
+		return  bestAttr +"\n" + instancesTrue.size() + "<>" + instancesFalse.size()+"\n"+computeNodeProbabilities()+
+				"\n"+attrsList.size()+"/"+originalAttrslist.size();
 	}
 
 	@Override
@@ -47,8 +50,18 @@ public class DtNode {
 		if (this.debug) {System.out.println(message);}
 	}
 	
-	public void computeNodeProbabilities() {
-		
+	public String computeNodeProbabilities() {
+		int liveCount 				= 0;
+		int dieCount				= 0;
+		for (LabelledDataInstance instance : containedInstances) {
+			if (instance.labelName.equals("live")) {liveCount++;}
+			if (instance.labelName.equals("die")) {dieCount++;}
+		}
+		double plive				= (double)liveCount / (double)containedInstances.size();
+		double pdie					= (double)dieCount / (double)containedInstances.size();
+		String probs				="L"+String.format("%.2f", plive)+" D"+String.format("%.2f", pdie)+"\n";
+		probs						+= "#L"+ liveCount +" #D" + dieCount+" #Total"+ containedInstances.size();
+		return probs;
 	}
 	public double computeGeniImpurity(String attribute){
 		int indexOfAttribute = originalAttrslist.indexOf(attribute);
@@ -138,6 +151,7 @@ public class DtNode {
 		
 		attrsList.remove(attrsList.indexOf(bestAttr));
 		computeGeniImpurity(bestAttr);
+		attributeToSplitOn							=(String)bestAttr;
 		nodeName									= bestAttr;
 		System.out.println("!!!"+ bestAttr + " " + containedInstances.size() +
 							" Split into True: "+ instancesTrue.size() + " & False: "+ instancesFalse.size() 
@@ -160,7 +174,7 @@ public class DtNode {
 	}
 	public void visualNode(Node startNode, Tree decisionTreeModel) {
 		startNode.setString("label", getBestAttr());
-		
+//		visualRepNode							= startNode;
 		for (DtNode child :this.children) {
 			Node childVisualNode				= decisionTreeModel.addChild(startNode);
 			childVisualNode.setString("label", child.getBestAttr());

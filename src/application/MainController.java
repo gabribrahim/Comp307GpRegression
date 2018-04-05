@@ -41,11 +41,11 @@ public class MainController {
 	public TreeView decisionTreeView;
 	public void setMain(Main main) {
 		this.main = main;
-		loadDataSet();		
+//		loadDataSet();		
 		decisionTreeModel					= new Tree();
 		
 		treeRootVisualNode					= decisionTreeModel.addRoot();
-		decisionTreeModel.addColumn("label",String.class,"test");
+		decisionTreeModel.addColumn("label",String.class,"Root");
 		decisionTreeView           			= new TreeView(decisionTreeModel,"label");
 		JPanel panel 						= new JPanel(new BorderLayout());		
 		panel.add(decisionTreeView);
@@ -55,7 +55,7 @@ public class MainController {
 		decisionTreeView.getVisualization().run("color");
 		decisionTreeView.getVisualization().run("layout");
 		decisionTreeView.getVisualization().run("fullPaint");
-		buildTree();
+//		buildTree();
 //		TestSN.setContent(graphComponent);
 
 		
@@ -84,9 +84,25 @@ public class MainController {
         Visualization vis = display.getVisualization();
         Rectangle2D bounds = vis.getBounds("_all_");
         GraphicsLib.expand(bounds, 50 + (int)(1/display.getScale()));
-//        DisplayLib.fitViewToBounds(display, bounds, 10);
+        DisplayLib.fitViewToBounds(display, bounds, 100);
         System.out.println(display);
         		
+	}
+	public void expandAllNode() {
+		decisionTreeView.getVisualization().setValue("_all_", null, VisualItem.EXPANDED, true);
+		decisionTreeView.setOrientation(2);
+		decisionTreeView.getVisualization().run("treeLayout");
+		decisionTreeView.getVisualization().run("repaint");
+		decisionTreeView.getVisualization().run("repaint");
+		decisionTreeView.getVisualization().run("color");
+		decisionTreeView.getVisualization().run("layout");
+		decisionTreeView.getVisualization().run("fullPaint");
+		decisionTreeView.getVisualization().run("subLayout");
+		decisionTreeView.getVisualization().run("textColor");
+		decisionTreeView.getVisualization().run("animatePaint");
+		decisionTreeView.getVisualization().run("animate");
+		decisionTreeView.getVisualization().run("edgeColor");
+		System.out.println("AA");
 	}
 
 	public void buildTree() {
@@ -96,12 +112,13 @@ public class MainController {
 		DtNode rootNode								= new DtNode(myDataLoader.trainingDataSetList,attrs,originalAttrs);
 		rootNode.branchNode();
 		rootNode.visualNode(treeRootVisualNode,decisionTreeModel);
-		decisionTreeView.setOrientation(2);
+		expandAllNode();
+		zoomToFitTree();
+//		decisionTreeView.setOrientation(2);
 
 		StatusTA.setText(rootNode.report());
 		
-		decisionTreeView.getVisualization().setValue("tree.nodes", null, VisualItem.EXPANDED, true);
-		zoomToFitTree();
+		
 	}	
 	
 	private String promptUserForChoice(List<String> dialogData, String message) {
