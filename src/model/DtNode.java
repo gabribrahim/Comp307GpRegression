@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import prefuse.data.Node;
 import prefuse.data.Tree;
+import prefuse.demos.TreeView;
 
 public class DtNode {
 	ArrayList<LabelledDataInstance> containedInstances ;
@@ -20,6 +21,8 @@ public class DtNode {
 	String bestAttr     						  	= "";
 	String attributeToSplitOn						= "";
 	Node visualRepNode;
+	public double geniImpurityThreshold					=0.0;
+	int numberOfAttrsAtInitiation ;
 	
 	public String getBestAttr() {
 		
@@ -27,8 +30,8 @@ public class DtNode {
 			return containedInstances.get(0).labelName + "\n"+computeNodeProbabilities();
 		}
 		if (bestAttr.equals("")){return nodeName;}
-		return  bestAttr +"\n" + instancesTrue.size() + "<>" + instancesFalse.size()+"\n"+computeNodeProbabilities()+
-				"\n"+attrsList.size()+"/"+originalAttrslist.size();
+		return  bestAttr +"\n" + instancesTrue.size() + "T<>" + instancesFalse.size()+"F\n"+computeNodeProbabilities()+
+				"\n"+attrsList.size()+"/"+numberOfAttrsAtInitiation;
 	}
 
 	@Override
@@ -41,8 +44,10 @@ public class DtNode {
 		super();
 		this.containedInstances		= containedInstances;
 		this.attrsList				= attrsList;
-		this.debug					= false;
+		this.debug					= true;
 		this.originalAttrslist		= originalAttrslist;
+		this.numberOfAttrsAtInitiation = attrsList.size();
+		System.out.println(containedInstances.size()+" " + attrsList.size());
 	}
 	
 	private void pp(String message) {
@@ -129,10 +134,16 @@ public class DtNode {
 	public void decideBestAttribute() {
 		double bestImpurity = 1.0 ;
 		
-		double impurtiyForAttribute;
+		double impurtiyForAttribute=2;
 		HashMap<String, Double> impurities  = new HashMap<String, Double>();
 		for (String attribute : attrsList) {
 			impurtiyForAttribute					= computeGeniImpurity(attribute);
+			if (impurtiyForAttribute<geniImpurityThreshold) {
+				bestImpurity						= impurtiyForAttribute;
+				bestAttr							= attribute;
+				impurities.put(attribute, impurtiyForAttribute);
+				break;
+			}			
 			if (impurtiyForAttribute==0) {
 				bestImpurity						= impurtiyForAttribute;
 				bestAttr							= attribute;
@@ -146,23 +157,23 @@ public class DtNode {
 				impurities.put(attribute, impurtiyForAttribute);
 			}
 			
-			
 		}
-		
+		System.out.println("Removing"+bestAttr+ "Attrs List Len = "+attrsList.size()+"____"+containedInstances.size()+" "+impurtiyForAttribute);			
 		attrsList.remove(attrsList.indexOf(bestAttr));
+//		System.out.println("Removed "+bestAttr+ "Attrs List Len = "+attrsList.size()+"____"+containedInstances.size());
 		computeGeniImpurity(bestAttr);
 		attributeToSplitOn							=(String)bestAttr;
 		nodeName									= bestAttr;
-		System.out.println("!!!"+ bestAttr + " " + containedInstances.size() +
-							" Split into True: "+ instancesTrue.size() + " & False: "+ instancesFalse.size() 
-							+ " Imp:"+bestImpurity);
-		System.out.println("\t"+impurities);
+//		System.out.println("!!!"+ bestAttr + " " + containedInstances.size() +
+//							" Split into True: "+ instancesTrue.size() + " & False: "+ instancesFalse.size() 
+//							+ " Imp:"+bestImpurity);
+//		System.out.println("\t"+impurities);
 		
 			
 	}
 	public String report() {
 		String reportString = "";
-		System.out.println(this);
+//		System.out.println(this);
 		reportString += toString()+"\n";
 			
 		for (DtNode child : this.children) {
@@ -172,13 +183,14 @@ public class DtNode {
 		return reportString;
 				
 	}
-	public void visualNode(Node startNode, Tree decisionTreeModel) {
+	public void visualNode(Node startNode, Tree decisionTreeModel, TreeView decisionTreeView) {
 		startNode.setString("label", getBestAttr());
 //		visualRepNode							= startNode;
 		for (DtNode child :this.children) {
 			Node childVisualNode				= decisionTreeModel.addChild(startNode);
 			childVisualNode.setString("label", child.getBestAttr());
-			child.visualNode(childVisualNode, decisionTreeModel);			
+			child.visualNode(childVisualNode, decisionTreeModel,decisionTreeView);
+//			decisionTreeView.getVisualization().getVisualItem("label", childVisualNode).dtName.replace("TEST",attributeToSplitOn);
 		}
 		
 	}
@@ -192,9 +204,12 @@ public class DtNode {
 		
 		decideBestAttribute();
 		
-		ArrayList<String> attrsClone= (ArrayList<String>) attrsList.clone();
+		ArrayList<String> attrsClone= new ArrayList<String>(attrsList) ;
+//		System.out.println(attributeToSplitOn+" List size" + attrsList.size() +" "+ attrsClone.size());
 		DtNode leftSideNode			= new DtNode(instancesTrue,attrsClone,originalAttrslist);
 		DtNode rightSideNode		= new DtNode(instancesFalse,attrsClone,originalAttrslist);
+		leftSideNode.geniImpurityThreshold= this.geniImpurityThreshold;
+		rightSideNode.geniImpurityThreshold=this.geniImpurityThreshold;
 		leftSideNode.branchNode();
 		rightSideNode.branchNode();
 		

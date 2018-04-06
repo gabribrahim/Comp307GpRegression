@@ -3,18 +3,28 @@ package application;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import model.DataSetsLoader;
 import model.DtNode;
 import prefuse.Display;
@@ -33,6 +43,9 @@ public class MainController {
 	@FXML Label MainLabel;	
 	@FXML SwingNode TreeP;
 	@FXML HBox ChartBox;
+	@FXML TextField GeniThresholdTF;
+	@FXML Label StatusLB;
+	@FXML VBox TreeSnapShot;
 	private Main main;
 	private DataSetsLoader myDataLoader = new DataSetsLoader();
 	public List<String> featuresList 	= new ArrayList<String>();
@@ -41,21 +54,10 @@ public class MainController {
 	public TreeView decisionTreeView;
 	public void setMain(Main main) {
 		this.main = main;
-//		loadDataSet();		
-		decisionTreeModel					= new Tree();
-		
-		treeRootVisualNode					= decisionTreeModel.addRoot();
-		decisionTreeModel.addColumn("label",String.class,"Root");
-		decisionTreeView           			= new TreeView(decisionTreeModel,"label");
-		JPanel panel 						= new JPanel(new BorderLayout());		
-		panel.add(decisionTreeView);
-		decisionTreeView.setBackground(Color.darkGray);
-		TreeP.setContent(panel);
-		decisionTreeView.getVisualization().run("repaint");
-		decisionTreeView.getVisualization().run("color");
-		decisionTreeView.getVisualization().run("layout");
-		decisionTreeView.getVisualization().run("fullPaint");
-//		buildTree();
+		loadDataSet();		
+		buildTree();
+//		expandAllNode();
+//		zoomToFitTree();
 //		TestSN.setContent(graphComponent);
 
 		
@@ -83,16 +85,16 @@ public class MainController {
 		Display display = (Display)decisionTreeView;
         Visualization vis = display.getVisualization();
         Rectangle2D bounds = vis.getBounds("_all_");
-        GraphicsLib.expand(bounds, 50 + (int)(1/display.getScale()));
+        GraphicsLib.expand(bounds, 10 + (int)(1/display.getScale()));
         DisplayLib.fitViewToBounds(display, bounds, 100);
-        System.out.println(display);
-        		
+//        System.out.println(display);
+
+		decisionTreeView.getVisualization().run("fontAction");
 	}
 	public void expandAllNode() {
 		decisionTreeView.getVisualization().setValue("_all_", null, VisualItem.EXPANDED, true);
 		decisionTreeView.setOrientation(2);
 		decisionTreeView.getVisualization().run("treeLayout");
-		decisionTreeView.getVisualization().run("repaint");
 		decisionTreeView.getVisualization().run("repaint");
 		decisionTreeView.getVisualization().run("color");
 		decisionTreeView.getVisualization().run("layout");
@@ -102,21 +104,39 @@ public class MainController {
 		decisionTreeView.getVisualization().run("animatePaint");
 		decisionTreeView.getVisualization().run("animate");
 		decisionTreeView.getVisualization().run("edgeColor");
-		System.out.println("AA");
+		
 	}
 
 	public void buildTree() {
+		decisionTreeModel					= new Tree();
+		
+		treeRootVisualNode					= decisionTreeModel.addRoot();
+		decisionTreeModel.addColumn("label",String.class,"Root");
+		decisionTreeView           			= new TreeView(decisionTreeModel,"label");
+		JPanel panel 						= new JPanel(new BorderLayout());		
+		panel.add(decisionTreeView);
+		decisionTreeView.setBackground(Color.darkGray);
+		TreeP.setContent(panel);
+		
+		decisionTreeView.getVisualization().run("repaint");
+		decisionTreeView.getVisualization().run("color");
+		decisionTreeView.getVisualization().run("layout");
+		decisionTreeView.getVisualization().run("fullPaint");
+		
 		ArrayList<String> attrs						= new ArrayList<String>(myDataLoader.dataSetAttrsLabels);
 		ArrayList<String> originalAttrs				= new ArrayList<String>(myDataLoader.dataSetAttrsLabels);
 		
 		DtNode rootNode								= new DtNode(myDataLoader.trainingDataSetList,attrs,originalAttrs);
+		rootNode.geniImpurityThreshold				= Double.parseDouble(GeniThresholdTF.getText());
 		rootNode.branchNode();
-		rootNode.visualNode(treeRootVisualNode,decisionTreeModel);
+		rootNode.visualNode(treeRootVisualNode,decisionTreeModel,decisionTreeView);
 		expandAllNode();
-		zoomToFitTree();
+//		zoomToFitTree();
 //		decisionTreeView.setOrientation(2);
 
 		StatusTA.setText(rootNode.report());
+		StatusLB.setText("Decision Tree @ Geni Impurity Threshold : "+ GeniThresholdTF.getText());
+//		saveSnapShot();
 		
 		
 	}	
@@ -135,5 +155,31 @@ public class MainController {
 
 		return selected;
 	}
-
+	
+	public void saveAsPng(String fileName) {
+		double scale							= 5;
+		Bounds bounds 							= TreeSnapShot.getLayoutBounds();
+		WritableImage image 					= new WritableImage(
+	            (int) Math.round(bounds.getWidth() * scale),
+	            (int) Math.round(bounds.getHeight() * scale));
+		
+		SnapshotParameters snapshotParams   	= new SnapshotParameters();
+		snapshotParams.setFill(javafx.scene.paint.Color.rgb(40, 40, 40, 1));
+		snapshotParams.setTransform(javafx.scene.transform.Transform.scale(scale, scale));
+		
+//	    WritableImage image2 					= TreeP.snapshot(snapshotParams,null);
+    	
+	    ImageView view 							= new ImageView(TreeSnapShot.snapshot(snapshotParams, image));
+	    File file = new File(fileName+".png");
+	    
+	    try {
+	        ImageIO.write(SwingFXUtils.fromFXImage(view.getImage(), null), "png", file);
+	    } catch (IOException e) {
+	        
+	    }
+	}	
+	public void saveSnapShot() {
+		saveAsPng("DTree_" + GeniThresholdTF.getText()+"_geniThreshold");
+	}
+		
 }
