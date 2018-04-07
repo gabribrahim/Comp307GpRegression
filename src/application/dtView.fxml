@@ -26,7 +26,7 @@
             </Lighting>
          </effect>
       </Region>
-      <Label id="MainLabel" fx:id="MainLabel" layoutX="17.0" layoutY="1.0" prefHeight="64.0" prefWidth="1004.0" text="Assignment 1 Question 2" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+      <Label id="MainLabel" fx:id="MainLabel" layoutX="17.0" layoutY="1.0" prefHeight="64.0" prefWidth="1004.0" text="Assignment 1 Question 3" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <font>
             <Font name="Andalus" size="29.0" />
          </font>
@@ -35,12 +35,14 @@
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="39.0" prefWidth="1024.0">
                <children>
-                  <Label prefHeight="38.0" text="Geni Impurity Threshold :.">
+                  <Label prefHeight="38.0" text="Learning Rate:.">
                      <padding>
                         <Insets left="10.0" right="10.0" />
                      </padding>
                   </Label>
-                  <TextField id="KnnTF" fx:id="GeniThresholdTF" text="0.2" />
+                  <TextField id="KnnTF" fx:id="GeniThresholdTF" text="1" />
+                  <Label text="Images In Data Set:." />
+                  <Slider fx:id="ImageSelectorSL" blockIncrement="1.0" majorTickUnit="1.0" min="1.0" minorTickCount="1" onMouseDragged="#changeImageInWin" prefHeight="39.0" prefWidth="474.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
@@ -50,23 +52,24 @@
          <children>
             <VBox prefHeight="457.0" prefWidth="259.0">
                <children>
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="39.0" prefWidth="755.0" text="Load Hepatitis Data Set" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#buildTree" prefHeight="39.0" prefWidth="755.0" text="Build Tree" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#zoomToFitTree" prefHeight="39.0" prefWidth="755.0" text="Fit View To Tree Nodes" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#expandAllNode" prefWidth="755.0" text="Expand All Nodes" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="39.0" prefWidth="755.0" text="Load Images" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#createFeatureProxiesFromLoadedImages" prefHeight="39.0" prefWidth="755.0" text="Sample Images Into Features" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="755.0" text="Draw Image &amp; Features" />
+                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="755.0" text="Train Perceptron 1 Image" />
+                  <Button fx:id="TrainAllBTN" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#trainAll" prefWidth="755.0" text="Train Perceptron" />
                   <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#saveSnapShot" prefWidth="755.0" text="Save Tree To PNG" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="755.0" text="Change Training/Test Ratio" />
                   <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="457.0" prefWidth="755.0" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
             <VBox fx:id="TreeSnapShot" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label fx:id="StatusLB" prefHeight="20.0" prefWidth="744.0" text="Status:">
+                  <Label fx:id="StatusLB" prefWidth="744.0" text="Status:">
                      <font>
                         <Font name="System Bold" size="9.0" />
                      </font>
                   </Label>
                   <SwingNode fx:id="TreeP" VBox.vgrow="ALWAYS" />
+                  <HBox fx:id="PreviewHB" prefHeight="100.0" prefWidth="200.0" />
                </children>
             </VBox>
          </children>

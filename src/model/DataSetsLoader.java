@@ -11,10 +11,10 @@ import java.util.Scanner;
 
 
 public class DataSetsLoader {
-	public ArrayList<LabelledDataInstance> trainingDataSetList= new ArrayList<LabelledDataInstance>();
+	public ArrayList<FullImage> trainingDataSetList= new ArrayList<FullImage>();
 	ArrayList<Float> minValuesForFeatures			= new ArrayList<Float>();
 	ArrayList<Float> maxValuesForFeatures			= new ArrayList<Float>();
-	public ArrayList<LabelledDataInstance> testDataSetList= new ArrayList<LabelledDataInstance>();
+	public ArrayList<FullImage> testDataSetList= new ArrayList<FullImage>();
 	public HashSet<String> dataSetClasses			= new HashSet<>();
 	public BaseClassifier myclassifier;
 	public String dataSetName;
@@ -39,27 +39,40 @@ public class DataSetsLoader {
 	
 	
 
-	public String loadHepDataSet(String filePath, ArrayList<LabelledDataInstance> dataSetList) {		
+	public String loadImageDataSet(String filePath, ArrayList<FullImage> dataSetList) {		
 		
 		File fileObj 								= new File(filePath);
 		//Reading File Contents & Creating Java Representation Objects for DataSet For Classifier Classes//
 		try (FileReader fileReader = new FileReader(fileObj);
 				BufferedReader bufferedReader		= new BufferedReader(fileReader);){
-			String line 							= bufferedReader.readLine(); // Class Labels
-			for (Scanner s = new Scanner(line); s.hasNext();) dataSetClasses.add(s.next());
-			line 									= bufferedReader.readLine(); // Attributes Labels
-			for (Scanner s = new Scanner(line); s.hasNext();) dataSetAttrsLabels.add(s.next());
-			line 									= bufferedReader.readLine();
+			String line 							= "";
+			String labelName						= "";
 			List <String>lineParts				    = new ArrayList<>(); 
 			while(line!= null) {
-				for (Scanner s = new Scanner(line); s.hasNext();) lineParts.add(s.next());
-				
-				line 								= bufferedReader.readLine();
-				LabelledDataInstance dataInstance   = new LabelledDataInstance(lineParts.subList(1, lineParts.size()),lineParts.get(0));
-				dataInstance.parseInformationToValues();
-				dataSetList.add(dataInstance);
-				lineParts.clear();
-//				System.out.println(dataInstance);
+				line								= bufferedReader.readLine();
+//				System.out.println(line);
+				while (!line.startsWith("P1")) { //Keeps Iterating & Fills LineParts with 0s & 1s till theline is P1					
+					for (Scanner s = new Scanner(line); s.hasNext();) lineParts.add(s.next());
+					line							= bufferedReader.readLine();
+					if (line==null) {break;}					
+				}
+				if (lineParts.size()>0) {					
+					FullImage imageInstance			= new FullImage(new ArrayList<String>(lineParts),labelName);
+//					System.out.println(lineParts);
+					imageInstance.parseInformationToValues();
+					dataSetList.add(imageInstance);
+					lineParts.clear();
+				}				
+				if (line==null) {break;}
+				if (line.startsWith("P1")) { // if Line is P1 Then Get Label Name
+					labelName						= bufferedReader.readLine();
+					dataSetClasses.add(labelName);
+//					System.out.println(labelName);
+					line							= bufferedReader.readLine(); // Read Count of Rows & Columns Lines Which I am hard coding
+//					System.out.println(line);
+				}
+
+
 			}
 		} catch (IOException e) {
 			System.out.println("FILE NOT FOUND !!");

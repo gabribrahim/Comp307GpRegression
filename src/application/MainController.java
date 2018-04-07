@@ -1,41 +1,37 @@
 package application;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
-import javax.swing.JPanel;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import model.DataSetsLoader;
-import model.DtNode;
-import prefuse.Display;
-import prefuse.Visualization;
-import prefuse.data.Node;
-import prefuse.data.Tree;
-import prefuse.demos.TreeView;
-import prefuse.util.GraphicsLib;
-import prefuse.util.display.DisplayLib;
-import prefuse.util.ui.UILib;
-import prefuse.visual.VisualItem;
+import model.FullImage;
 
 public class MainController {
 	// UI ELEMENTS
@@ -46,101 +42,93 @@ public class MainController {
 	@FXML TextField GeniThresholdTF;
 	@FXML Label StatusLB;
 	@FXML VBox TreeSnapShot;
+	@FXML Slider ImageSelectorSL;
+	@FXML HBox PreviewHB;
+	
+	
 	private Main main;
 	private DataSetsLoader myDataLoader = new DataSetsLoader();
-	public List<String> featuresList 	= new ArrayList<String>();
-	public Node treeRootVisualNode;
-	public Tree decisionTreeModel;
-	public TreeView decisionTreeView;
+	private Canvas canvas 				= new Canvas(10, 10);
+	private GraphicsContext gc 			= canvas.getGraphicsContext2D();
+	
 	public void setMain(Main main) {
 		this.main = main;
-		loadDataSet();		
-		buildTree();
-//		expandAllNode();
-//		zoomToFitTree();
-//		TestSN.setContent(graphComponent);
-
-		
-//		System.out.println(myDataLoader);
-		
-
+		PreviewHB.getChildren().add(0, canvas);
+		canvas.setScaleX(20);
+		canvas.setScaleY(20);
+		canvas.setTranslateX(100);
+		canvas.setTranslateY(100);		
+		gc.clearRect(0, 0, 10, 10);
+		gc.setFill(Color.BLACK);		
+		gc.fillRect(0, 0, 10, 10);		
+		System.out.println(canvas.getHeight());
+        loadDataSet();
 	}
 	
-	public void loadDataSet() {
-		System.out.println("Loading Hep DataSet");
-		myDataLoader.dataSetName = "Hepatitis Dataset";
-		myDataLoader.clear();
+	
+	public void trainAll() {
+		Task<Void> task = new Task<Void>() {
+		    @Override public Void call() {
+		        int max = 100;
+		        for (int i=1; i<=max; i++) {
+		            if (isCancelled()) {
+		               break;
+		            }
+		            drawImage(i);
+		            try {
+						Thread.sleep(5);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+//						e.printStackTrace();
+					}
+		        }
+		        return null;
+		    }
+		};
+		new Thread(task).start();		
+	}
+	
+	public void drawImage(int imageIndex) {
+		gc.clearRect(0, 0, 100, 100);
+		gc.setFill(Color.BLACK);		
+		gc.fillRect(0, 0, 10, 10);			
+		StatusLB.setText("Previewing Image "+imageIndex);
+		FullImage imageInstance			= myDataLoader.trainingDataSetList.get(imageIndex-1);
+		PixelWriter pw					= gc.getPixelWriter();
+//		System.out.println(imageInstance.getPixels());
+		for (ArrayList<Integer>pixel :imageInstance.getPixels()) {
+			int pixelValue				= pixel.get(2);
+			if (pixelValue==1) {
+				pw.setColor(pixel.get(0), pixel.get(1), Color.WHITE);
+				}
+		
+			}
+		}
+	public void changeImageInWin() {
+		
+		int imageIndex					= (int)ImageSelectorSL.getValue();
+		drawImage(imageIndex);
+		
+		}
+		
 
-		String trainingFilePath		= System.getProperty("user.dir").replace('\\', '/') + "/hepatitis-training.dat";
-		String testFilePath			= System.getProperty("user.dir").replace('\\', '/') + "/hepatitis-test.dat";
-		myDataLoader.loadHepDataSet(trainingFilePath, myDataLoader.trainingDataSetList);
+	
+	public void loadDataSet() {
+		System.out.println("Loading Images DataSet");
+		String trainingFilePath		= System.getProperty("user.dir").replace('\\', '/') + "/image.data";
+		
+		myDataLoader.loadImageDataSet(trainingFilePath, myDataLoader.trainingDataSetList);
+		myDataLoader.dataSetName	= "ImageDataSet";
 		StatusTA.setText(myDataLoader.toString());
-		myDataLoader.loadHepDataSet(testFilePath, myDataLoader.testDataSetList);
 		StatusTA.appendText("Test Data Set Size = " + myDataLoader.testDataSetList.size());
 
 	
 	}
-	public void zoomToFitTree() {
-    	
-		Display display = (Display)decisionTreeView;
-        Visualization vis = display.getVisualization();
-        Rectangle2D bounds = vis.getBounds("_all_");
-        GraphicsLib.expand(bounds, 10 + (int)(1/display.getScale()));
-        DisplayLib.fitViewToBounds(display, bounds, 100);
-//        System.out.println(display);
-
-		decisionTreeView.getVisualization().run("fontAction");
+	public void createFeatureProxiesFromLoadedImages() {
+		for (FullImage imageInstance : myDataLoader.trainingDataSetList) {			
+			System.out.println(imageInstance.labelName+imageInstance.featureListAsValues.size());			
+		}
 	}
-	public void expandAllNode() {
-		decisionTreeView.getVisualization().setValue("_all_", null, VisualItem.EXPANDED, true);
-		decisionTreeView.setOrientation(2);
-		decisionTreeView.getVisualization().run("treeLayout");
-		decisionTreeView.getVisualization().run("repaint");
-		decisionTreeView.getVisualization().run("color");
-		decisionTreeView.getVisualization().run("layout");
-		decisionTreeView.getVisualization().run("fullPaint");
-		decisionTreeView.getVisualization().run("subLayout");
-		decisionTreeView.getVisualization().run("textColor");
-		decisionTreeView.getVisualization().run("animatePaint");
-		decisionTreeView.getVisualization().run("animate");
-		decisionTreeView.getVisualization().run("edgeColor");
-		
-	}
-
-	public void buildTree() {
-		decisionTreeModel					= new Tree();
-		
-		treeRootVisualNode					= decisionTreeModel.addRoot();
-		decisionTreeModel.addColumn("label",String.class,"Root");
-		decisionTreeView           			= new TreeView(decisionTreeModel,"label");
-		JPanel panel 						= new JPanel(new BorderLayout());		
-		panel.add(decisionTreeView);
-		decisionTreeView.setBackground(Color.darkGray);
-		TreeP.setContent(panel);
-		
-		decisionTreeView.getVisualization().run("repaint");
-		decisionTreeView.getVisualization().run("color");
-		decisionTreeView.getVisualization().run("layout");
-		decisionTreeView.getVisualization().run("fullPaint");
-		
-		ArrayList<String> attrs						= new ArrayList<String>(myDataLoader.dataSetAttrsLabels);
-		ArrayList<String> originalAttrs				= new ArrayList<String>(myDataLoader.dataSetAttrsLabels);
-		
-		DtNode rootNode								= new DtNode(myDataLoader.trainingDataSetList,attrs,originalAttrs);
-		rootNode.geniImpurityThreshold				= Double.parseDouble(GeniThresholdTF.getText());
-		rootNode.branchNode();
-		rootNode.visualNode(treeRootVisualNode,decisionTreeModel,decisionTreeView);
-		expandAllNode();
-//		zoomToFitTree();
-//		decisionTreeView.setOrientation(2);
-
-		StatusTA.setText(rootNode.report());
-		StatusLB.setText("Decision Tree @ Geni Impurity Threshold : "+ GeniThresholdTF.getText());
-//		saveSnapShot();
-		
-		
-	}	
-	
 	private String promptUserForChoice(List<String> dialogData, String message) {
 		ChoiceDialog<String> dialog = new ChoiceDialog<String>(dialogData.get(0), dialogData);
 		dialog.setTitle("");
