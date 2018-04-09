@@ -19,6 +19,8 @@ public class DataSetsLoader {
 	public BaseClassifier myclassifier;
 	public String dataSetName;
 	public HashSet<String> dataSetAttrsLabels		= new HashSet<>();
+	public int pixelCountPerFeature					= 4;
+	public int featureCountPerImage					= 50;
 	
 	@Override
 	public String toString() {
@@ -60,6 +62,9 @@ public class DataSetsLoader {
 					FullImage imageInstance			= new FullImage(new ArrayList<String>(lineParts),labelName);
 //					System.out.println(lineParts);
 					imageInstance.parseInformationToValues();
+					imageInstance.featuresCount		= featureCountPerImage;
+					imageInstance.pixelsCountPerFeature= pixelCountPerFeature;
+					imageInstance.generateFeatures();
 					dataSetList.add(imageInstance);
 					lineParts.clear();
 				}				
