@@ -10,12 +10,15 @@ public class FullImage{
 	// Future Get that number from the DataSetsLoaderClass at time of construction
 	public int featuresCount			= 50;
 	public int pixelsCountPerFeature	= 4 ;
-	public int[][] imagePixels 			= new int[10][10];	
+	public int[][] imagePixels 			= new int[10][10];
+	public boolean[][] imagePixelsBools	= new boolean[10][10];
 	public ArrayList<FeatureNode> imageFeatures = new ArrayList<>();
 	public List<String> featuresListAsStrings;
 	public String labelName;
-	public ArrayList<Integer> featureListAsValues = new ArrayList<>();	
+	public ArrayList<Integer> featureListAsValues = new ArrayList<>();
+	public ArrayList<Boolean> featureListAsBools  = new ArrayList<>();	
 	public String predictedClass;
+	public int randomSeed				= 0;
 	
 	public FullImage(List<String> featuresList, String labelName) {
 		super();
@@ -38,10 +41,13 @@ public class FullImage{
 			for (int i=0; i<linepart.length();i++) {
 				String substring 			= linepart.substring(i, i+1);
 				if (substring==null) {continue;}
-				featureListAsValues.add(Integer.parseInt(substring));
+				featureListAsValues.add(Integer.parseInt(substring));				
+				if (substring.equals("1")) {featureListAsBools.add(true);}
+				if (substring.equals("1")) {featureListAsBools.add(false);}
 			}
 		}
-		
+
+		// Create 2D Array Of Integers for Image Pixels
 		int row								= 0;
 		int col								= 0;
 		for (int pixelValue : featureListAsValues) {
@@ -50,34 +56,35 @@ public class FullImage{
 			if (col==10) {col=0;row++;}
 			
 		}
+		// Create 2D Array of Booleans For Image Pixels
+		row									= 0;
+		col									= 0;
+		for (boolean pixelValue : featureListAsBools) {
+			imagePixelsBools[row][col]			=pixelValue;			
+			col ++;
+			if (col==10) {col=0;row++;}
+			
+		}
+		
 		
 	}
 	
 	public Pixel getValidRandomPixel(Random randomGen) {
-		// Cast Random column, row, and sign and checks if its valid with original image
-		boolean valid						= false;
+		// Cast Random column, row,bolean in a pixel
+//		boolean valid						= false;
 		boolean sign 						= randomGen.nextBoolean();
 		int row 							= randomGen.nextInt(10);
 		int col 							= randomGen.nextInt(10);		
-		while (!valid) {
-			sign							= randomGen.nextBoolean();
-			row								= randomGen.nextInt(10);
-			col								= randomGen.nextInt(10);
-			if (imagePixels[row][col]==1 && sign==true) {
-				valid						= true;
-				break;
-			}
-			if (imagePixels[row][col]== 0 && sign==false) {
-				valid						= true;
-				break;
-			}			
-		}
 		Pixel pixel							= new Pixel(row,col,sign);
 		return pixel;
 	}
 	public void generateFeatures() {
 	imageFeatures.clear();
-	Random randomGen						= new Random(10);
+	Random randomGen;
+	if (randomSeed==0) {randomGen= new Random();}
+	else {randomGen= new Random(randomSeed);}
+	
+	System.out.println(randomSeed);
 	int fCounter							= 0;
 	while (fCounter<featuresCount) {
 			ArrayList<Pixel> pixels			= new ArrayList<>();
@@ -86,12 +93,12 @@ public class FullImage{
 				Pixel randomValidPixel		= getValidRandomPixel(randomGen);
 				pixels.add(randomValidPixel);
 				BasePNode featurePixelInput = new BasePNode();
-				featurePixelInput.setOutput(randomValidPixel.sign?1.0:0.0);
-				imageFeature.inputs.add(featurePixelInput);
-				imageFeature.weights.add(randomValidPixel.sign?1.0:-1.0);
+				featurePixelInput.setOutput(1);
+				imageFeature.inputs.add(featurePixelInput);				
 			}
 //			System.out.println(imageFeature);
 			fCounter++;
+			imageFeature.originalImage		= this;
 			imageFeature.getOutput();
 			imageFeatures.add(imageFeature);
 		}

@@ -3,25 +3,30 @@ package application;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -50,30 +55,140 @@ public class MainController {
 	@FXML HBox PreviewHB;
 	@FXML Group ImagePrevGRP;
 	@FXML Group FeaturePrevGRP;
+	@FXML Group AllInputsPreviewGRP;
 	@FXML TextField PixelCountTF;
 	@FXML TextField FeaturesCountTF;
 	@FXML TextArea InputsVectorTA;
 	@FXML TextArea WeightsVectorTA;
-	
+	@FXML ScrollPane AllInputsPreviewPN;
+	@FXML TextField EpochsTF;
+	@FXML TextField LearningRateTF;
+	@FXML VBox LearningCurveBox;
+	@FXML TextField RandomTF;
 	private Main main;
 	private DataSetsLoader myDataLoader = new DataSetsLoader();
 	private Canvas imageCanvas 				= new Canvas(10, 10);
 	private GraphicsContext imageGc 			= imageCanvas.getGraphicsContext2D();
 	private Canvas featureCanvas 				= new Canvas(10, 10);
 	private GraphicsContext featureGc 			= featureCanvas.getGraphicsContext2D();
+	private Canvas inputLayerCanvas				= new Canvas(100, 50);
+	private GraphicsContext inputLayerGc		= inputLayerCanvas.getGraphicsContext2D();	
 	private BasePNode perceptronNode;
+	private int totalEpochsCount				= 0;
+	private HashMap<Integer, Double> learningcurve=new HashMap<>();
+    private NumberAxis xAxis 					= new NumberAxis();
+    private NumberAxis yAxis 					= new NumberAxis();
+    private LineChart<Number,Number> lineChart  = new LineChart<Number,Number>(xAxis,yAxis);
+	private int debugImageIndex					= 0;
 	public void setMain(Main main) {
 		this.main = main;
 		setupCanvases();
         loadDataSet();
-        myDataLoader.trainingDataSetList.get(0).generateFeatures();
+        changeImageInWin();
+        drawFeature(0, 0);
+        drawAllFeatures();    
+        createPerceptron();
 	}
 	
 	public void createPerceptron() {
 		perceptronNode							= new BasePNode();
-		perceptronNode.inputs					= new ArrayList<>(myDataLoader.trainingDataSetList.get(0).imageFeatures);
-		perceptronNode.generateRandomWeights();
+		perceptronNode.setInputs(myDataLoader.trainingDataSetList.get(0).imageFeatures);
+		perceptronNode.generateWeights();
 		WeightsVectorTA.setText(perceptronNode.getWeightVectorSring());
+		StatusTA.setText("Create New Preceptron & Assigned Random Weights");
+	}
+	
+	public void testPerceptron() {
+		//Train the neuron Giving it the current Image & its features list as inputs
+		int imageIndex					= (int)ImageSelectorSL.getValue();		
+		FullImage currentImage			= myDataLoader.trainingDataSetList.get(imageIndex);
+		perceptronNode.originalImage	= currentImage;
+		perceptronNode.setInputs(currentImage.imageFeatures);
+		perceptronNode.getOutput();
+//		perceptronNode.tweakWeights();		
+		WeightsVectorTA.setText(perceptronNode.getWeightVectorSring());
+		StatusTA.setText("Trained Perceptron On Image Index " + imageIndex + "\nImage Class = " + currentImage.labelName
+						+"\nWeightedSum = "+perceptronNode.weightedSum
+						+"\nOutput = "+perceptronNode.output
+						+"\nError = "+perceptronNode.error);
+	}
+	public void debug() {
+		int hits = 0;		
+		FullImage currentImage			= myDataLoader.trainingDataSetList.get(debugImageIndex);
+		perceptronNode.learningRate		= Double.parseDouble(LearningRateTF.getText());
+		perceptronNode.originalImage	= currentImage;
+		perceptronNode.debug			= true;
+		perceptronNode.setInputs(currentImage.imageFeatures);
+		perceptronNode.getOutput();
+		perceptronNode.tweakWeights();
+		if (perceptronNode.error==0) {hits++;}
+		System.out.println();
+		System.out.println(debugImageIndex + " " + currentImage.labelName + " Error= "+perceptronNode.error
+				+" Output = "+perceptronNode.output
+				+" Weighted Sum = " + perceptronNode.weightedSum);
+		
+		debugImageIndex++;
+		
+	}
+	public void trainPerceptronForEpochs() {
+		int numberOfEpochs						= Integer.parseInt(EpochsTF.getText());
+		perceptronNode.learningRate				= Double.parseDouble(LearningRateTF.getText());
+		perceptronNode.debug					= false;
+		for (int k=0; k<numberOfEpochs; k++) {
+			int hits							= 0;
+			int totalError						= 0;
+			totalEpochsCount = totalEpochsCount+1;
+			for (int i=0; i<myDataLoader.trainingDataSetList.size();i++) {
+				FullImage currentImage			= myDataLoader.trainingDataSetList.get(i);
+				perceptronNode.setInputs(currentImage.imageFeatures);
+				perceptronNode.originalImage	= currentImage;
+				perceptronNode.getOutput();
+				perceptronNode.tweakWeights();
+				totalError						+= perceptronNode.error;
+				if( perceptronNode.error == 0) {hits++;}
+				WeightsVectorTA.setText(perceptronNode.getWeightVectorSring());
+				StatusTA.setText("Trained Perceptron On Image Index " + i + "\nImage Class = " + currentImage.labelName
+								+"\nWeightedSum = "+perceptronNode.weightedSum
+								+"\nOutput = "+perceptronNode.output
+								+"\nError = "+perceptronNode.error);
+					
+				
+			}			
+			double accuracy						= (double)hits / (double)myDataLoader.trainingDataSetList.size();
+			double learningError				= 1-accuracy;
+			StatusTA.setText("Accuracy @ Epoch " + totalEpochsCount + " = " + accuracy + "Hits = " + hits+"\n"
+								+"Total Error = "+totalError+"\n");
+			if (hits==myDataLoader.trainingDataSetList.size()) {break;}
+			System.out.println(accuracy+","+learningError);
+			learningcurve.put(totalEpochsCount, learningError);
+			
+		}
+		drawLearningCurve();
+	}
+	public void setupLearningCurveChart() {
+        xAxis.setLabel("Epoch");
+        yAxis.setLabel("Error");        
+//        lineChart.setTitle("Learning Curve");
+        lineChart.setCreateSymbols(false);
+        lineChart.setAnimated(false);
+        lineChart.getXAxis().setAutoRanging(true);
+		lineChart.getYAxis().setAutoRanging(true);
+		lineChart.setVerticalGridLinesVisible(true);        
+
+	}
+	public void drawLearningCurve() {
+		lineChart.getData().clear();
+		XYChart.Series<Number,Number> series 	= new XYChart.Series<>();
+		double pointsToSkip						= learningcurve.size()*0.01;
+		Iterator iter							=learningcurve.entrySet().iterator();
+		while(iter.hasNext()) {
+			Map.Entry<Integer,Double> point		= (Map.Entry)iter.next();
+			series.getData().add(new XYChart.Data(point.getKey(), point.getValue()));
+			for(int i=0; i<(int)pointsToSkip;i++) {
+				if(iter.hasNext()) {iter.next();}
+			}
+		}
+		lineChart.getData().add(series);
 		
 	}
 	public void setupCanvases() {
@@ -95,6 +210,23 @@ public class MainController {
 		featureGc.clearRect(0, 0, 10, 10);
 		featureGc.setFill(Color.BLACK);		
 		featureGc.fillRect(0, 0, 10, 10);		
+		
+		// Input Layer Preview Canvas
+
+		inputLayerCanvas.setScaleX(3.5);
+		inputLayerCanvas.setScaleY(3.5);
+		inputLayerGc.scale(3.5, 3.5);
+		AllInputsPreviewGRP.getChildren().add(0, inputLayerCanvas);
+		AllInputsPreviewPN.setContent(AllInputsPreviewGRP);
+		AllInputsPreviewPN.setPannable(true);		
+
+		inputLayerGc.clearRect(0, 0, 100, 50);
+		inputLayerGc.setFill(Color.BLACK);		
+		inputLayerGc.fillRect(0, 0, 100, 50);	
+		
+		setupLearningCurveChart();
+		LearningCurveBox.getChildren().add(lineChart);
+		
 		
 
 		
@@ -151,6 +283,27 @@ public class MainController {
 			}
 		}
 	
+	public void drawAllInputsOfDataSet() {
+		int canvasHeight				= Integer.parseInt(FeaturesCountTF.getText());
+		int canvasWidth					= myDataLoader.trainingDataSetList.size() ;
+		inputLayerCanvas.setHeight(canvasHeight);
+		inputLayerCanvas.setWidth(canvasWidth);
+		inputLayerGc.clearRect(0, 0, canvasWidth, canvasHeight);
+		inputLayerGc.setFill(Color.BLACK);		
+		inputLayerGc.fillRect(0, 0, canvasWidth, canvasHeight);		
+		
+//		FullImage imageInstance			= myDataLoader.trainingDataSetList.get(imageIndex);
+		PixelWriter pw					= inputLayerGc.getPixelWriter();
+				
+		for (FullImage image :myDataLoader.trainingDataSetList) {
+			int imageIndex				= myDataLoader.trainingDataSetList.indexOf(image);
+			for (int j=0; j<Integer.parseInt(FeaturesCountTF.getText());j++) {
+				if(image.imageFeatures.get(j).output==1.0) {
+					pw.setColor(imageIndex,j, Color.WHITE);
+				}
+			}
+		}
+	}
 	public void drawAllFeatures() {
 		Task<Void> task = new Task<Void>() {
 		    @Override public Void call() {
@@ -172,7 +325,8 @@ public class MainController {
 		    }
 		};
 		
-		new Thread(task).start();				
+		new Thread(task).start();
+		drawAllInputsOfDataSet();
 	}
 	public void drawFeature(int imageIndex ,int featureIndex) {
 		
@@ -199,7 +353,7 @@ public class MainController {
 		// Draw Feature Pixels
 		StatusTA.setText(featureOfImage.toString());
 		for (model.Pixel pixel : featureOfImage.inputPixels) {
-				if (pixel.sign) {
+				if (pixel.sign==imageInstance.imagePixelsBools[pixel.x][pixel.y]) {
 					pw2.setColor(pixel.x, pixel.y, Color.BLUE);
 				}
 				else {
@@ -211,9 +365,12 @@ public class MainController {
 	public void changeImageInWin() {
 		
 		int imageIndex					= (int)ImageSelectorSL.getValue();
+		int featureIndex				= (int)FeatureSelectorSL.getValue();
 		StatusLB.setText("Previewing Image "+imageIndex);
 		drawImage(imageIndex);
-		
+		drawAllInputsOfDataSet();
+		PixelWriter pw					= inputLayerGc.getPixelWriter();
+		pw.setColor(imageIndex,featureIndex, Color.rgb(255, 102, 0, 1));
 		}
 		
 	public void changeFeatureInWin() {
@@ -221,7 +378,9 @@ public class MainController {
 		int featureIndex				= (int)FeatureSelectorSL.getValue();
 		StatusLB.setText("Previewing Feature "+featureIndex);
 		drawFeature(imageIndex, featureIndex);
-		
+		drawAllInputsOfDataSet();
+		PixelWriter pw					= inputLayerGc.getPixelWriter();
+		pw.setColor(imageIndex,featureIndex, Color.rgb(255, 102, 0, 1));		
 		
 		
 				
@@ -229,13 +388,17 @@ public class MainController {
 	
 	public void loadDataSet() {
 		// Loads Images From Disk 
+		totalEpochsCount			= 0;
+		learningcurve.clear();
 		System.out.println("Loading Images DataSet");
 		int pixelCount				= Integer.parseInt(PixelCountTF.getText());
 		int featureCount			= Integer.parseInt(FeaturesCountTF.getText());
+		int randomSeed				= Integer.parseInt(RandomTF.getText());
 		String trainingFilePath		= System.getProperty("user.dir").replace('\\', '/') + "/image.data";
 		myDataLoader.clear();
 		myDataLoader.featureCountPerImage= featureCount;
 		myDataLoader.pixelCountPerFeature=pixelCount;
+		myDataLoader.randomSeed		= randomSeed;
 		myDataLoader.loadImageDataSet(trainingFilePath, myDataLoader.trainingDataSetList);
 		myDataLoader.dataSetName	= "ImageDataSet";
 		StatusTA.setText(myDataLoader.toString());
