@@ -21,6 +21,7 @@ public class DataSetsLoader {
 	public HashSet<String> dataSetAttrsLabels		= new HashSet<>();
 	public int pixelCountPerFeature					= 4;
 	public int featureCountPerImage					= 50;
+	public int randomSeed							= 0;
 	
 	@Override
 	public String toString() {
@@ -64,6 +65,7 @@ public class DataSetsLoader {
 					imageInstance.parseInformationToValues();
 					imageInstance.featuresCount		= featureCountPerImage;
 					imageInstance.pixelsCountPerFeature= pixelCountPerFeature;
+					imageInstance.randomSeed		= randomSeed;
 					imageInstance.generateFeatures();
 					dataSetList.add(imageInstance);
 					lineParts.clear();

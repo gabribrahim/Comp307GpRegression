@@ -15,93 +15,117 @@
 
 <AnchorPane fx:id="RootAP" prefHeight="685.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <children>
-      <Region id="LoadIrisBTN" layoutX="150.0" layoutY="6.0" prefHeight="64.0" prefWidth="1004.0" AnchorPane.bottomAnchor="470.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="6.0">
-         <effect>
-            <Lighting specularExponent="17.97">
-               <bumpInput>
-                  <DropShadow />
-               </bumpInput>
-               <light>
-                  <Light.Distant color="#4a3e3e" />
-               </light>
-            </Lighting>
-         </effect>
-      </Region>
-      <Label id="MainLabel" fx:id="MainLabel" layoutX="17.0" layoutY="1.0" prefHeight="64.0" prefWidth="1004.0" text="Assignment 1 Question 3" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
-         <font>
-            <Font name="Andalus" size="29.0" />
-         </font>
-      </Label>
-      <VBox layoutX="40.0" layoutY="558.0" prefHeight="100.0" prefWidth="1004.0" spacing="7.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+      <VBox prefHeight="685.0" prefWidth="1030.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="39.0" prefWidth="1024.0">
+            <Label id="MainLabel" fx:id="MainLabel" prefHeight="64.0" prefWidth="1004.0" text="Assignment 1 Question 3">
+               <font>
+                  <Font name="Andalus" size="29.0" />
+               </font>
+            </Label>
+            <HBox id="ChartBox" fx:id="ChartBox" prefHeight="410.0" prefWidth="1283.0">
                <children>
-                  <Label prefHeight="38.0" text="Learning Rate:.">
-                     <padding>
-                        <Insets left="10.0" right="10.0" />
-                     </padding>
-                  </Label>
-                  <TextField id="KnnTF" fx:id="GeniThresholdTF" text="1" />
-                  <Label text="Images In Data Set:." />
-                  <Slider fx:id="ImageSelectorSL" blockIncrement="1.0" majorTickUnit="1.0" max="99.0" minorTickCount="1" onMouseDragged="#changeImageInWin" prefHeight="39.0" prefWidth="474.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" HBox.hgrow="ALWAYS" />
-               </children>
-            </HBox>
-            <Separator prefWidth="200.0" />
-            <HBox prefHeight="100.0" prefWidth="200.0">
-               <children>
-                  <Label text="Pixels Count:." />
-                  <TextField fx:id="PixelCountTF" maxWidth="62.0" text="4" />
-                  <Label text="Features Count:." />
-                  <TextField fx:id="FeaturesCountTF" maxWidth="62.0" text="50" />
-                  <Label text="Features In Image:." />
-                  <Slider fx:id="FeatureSelectorSL" blockIncrement="1.0" majorTickUnit="1.0" max="49.0" minorTickCount="1" onMouseDragged="#changeFeatureInWin" prefHeight="39.0" prefWidth="474.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" HBox.hgrow="ALWAYS" />
-               </children>
-            </HBox>
-         </children>
-      </VBox>
-      <HBox id="ChartBox" fx:id="ChartBox" layoutX="11.0" layoutY="49.0" maxWidth="-Infinity" prefHeight="495.0" prefWidth="1004.0" AnchorPane.bottomAnchor="115.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="49.0">
-         <children>
-            <VBox prefHeight="457.0" prefWidth="259.0">
-               <children>
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="39.0" prefWidth="755.0" text="Load Images" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#createFeatureProxiesFromLoadedImages" prefHeight="39.0" prefWidth="755.0" text="Create Features For Images" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#drawAllFeatures" prefWidth="755.0" text="Draw Image &amp; Features" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#createPerceptron" prefHeight="39.0" prefWidth="755.0" text="Create Perceptron" />
-                  <Button fx:id="TrainAllBTN" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#trainAll" prefWidth="755.0" text="Train Perceptron" />
-                  <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#saveSnapShot" prefWidth="755.0" text="Save Tree To PNG" />
-                  <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="457.0" prefWidth="755.0" VBox.vgrow="ALWAYS" />
-               </children>
-            </VBox>
-            <VBox fx:id="TreeSnapShot" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label fx:id="StatusLB" prefWidth="744.0" text="Status:">
-                     <font>
-                        <Font name="System Bold" size="9.0" />
-                     </font>
-                  </Label>
-                  <SwingNode fx:id="TreeP" VBox.vgrow="ALWAYS" />
-                  <HBox fx:id="PreviewHB" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                  <VBox prefHeight="457.0" prefWidth="259.0">
                      <children>
-                        <Group fx:id="ImagePrevGRP" HBox.hgrow="ALWAYS" />
-                        <Label text="&lt;&lt;Image Preview || Feature Preview &gt;&gt;" />
-                        <Group fx:id="FeaturePrevGRP" HBox.hgrow="ALWAYS" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="39.0" prefWidth="755.0" text="Load Images" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#createFeatureProxiesFromLoadedImages" prefHeight="39.0" prefWidth="755.0" text="Create Features For Images" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#drawAllInputsOfDataSet" prefWidth="755.0" text="Draw All Features In DataSet" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#createPerceptron" prefHeight="39.0" prefWidth="755.0" text="Create Perceptron" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#debug" prefWidth="755.0" text="Test Current IMG" />
+                        <Button alignment="BOTTOM_LEFT" mnemonicParsing="false" onAction="#trainPerceptronForEpochs" prefWidth="755.0" text="Train For K Epochs" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#saveSnapShot" prefWidth="755.0" text="Save Tree To PNG" />
+                        <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="457.0" prefWidth="755.0" wrapText="true" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox fx:id="TreeSnapShot" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="StatusLB" prefWidth="744.0" text="Status:">
+                           <font>
+                              <Font name="System Bold" size="9.0" />
+                           </font>
+                        </Label>
+                        <SwingNode fx:id="TreeP" VBox.vgrow="ALWAYS" />
+                        <HBox fx:id="PreviewHB" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Group fx:id="ImagePrevGRP" HBox.hgrow="ALWAYS" />
+                              <Label text="&lt;&lt;Image Preview    Feature Preview &gt;&gt;" wrapText="true" />
+                              <Group fx:id="FeaturePrevGRP" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                        <Label text="All Features of DataSet Preview" />
+                        <Group fx:id="AllInputsPreviewGRP" />
+                        <ScrollPane fx:id="AllInputsPreviewPN" pannable="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                          </content>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </ScrollPane>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label alignment="BASELINE_CENTER" contentDisplay="CENTER" text="Image Input Vector" textAlignment="CENTER" wrapText="true">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                        <TextArea fx:id="InputsVectorTA" prefHeight="200.0" prefWidth="50.0" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font name="System Bold" size="6.0" />
+                           </font>
+                        </TextArea>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label text="Perceptron Weights" wrapText="true">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                        <TextArea fx:id="WeightsVectorTA" prefHeight="200.0" prefWidth="50.0" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font name="System Bold" size="6.0" />
+                           </font>
+                        </TextArea>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <VBox fx:id="LearningCurveBox" prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS" />
+            <VBox prefHeight="100.0" prefWidth="1004.0" spacing="7.0">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="39.0" prefWidth="1024.0">
+                     <children>
+                        <Label prefHeight="38.0" text="Learning Rate:.">
+                           <padding>
+                              <Insets left="10.0" right="10.0" />
+                           </padding>
+                        </Label>
+                        <TextField id="KnnTF" fx:id="LearningRateTF" maxWidth="62.0" text="0.2" />
+                        <Label text="Epochs :." />
+                        <TextField fx:id="EpochsTF" maxWidth="62.0" text="1" />
+                        <Label text="Images In Data Set:." />
+                        <Slider fx:id="ImageSelectorSL" blockIncrement="1.0" majorTickUnit="1.0" max="99.0" minorTickCount="1" onMouseDragged="#changeImageInWin" prefHeight="39.0" prefWidth="474.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+                  <Separator prefWidth="200.0" />
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Pixels Count:." />
+                        <TextField fx:id="PixelCountTF" maxWidth="62.0" text="4" />
+                        <Label text="Features Count:." />
+                        <TextField fx:id="FeaturesCountTF" maxWidth="62.0" text="50" />
+                        <Label text="Random" />
+                        <TextField fx:id="RandomTF" prefWidth="62.0" text="4567892" />
+                        <Label text="Features In Image:." />
+                        <Slider fx:id="FeatureSelectorSL" blockIncrement="1.0" majorTickUnit="1.0" max="49.0" minorTickCount="1" onMouseDragged="#changeFeatureInWin" prefHeight="39.0" prefWidth="200.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" HBox.hgrow="ALWAYS" />
                      </children>
                   </HBox>
                </children>
             </VBox>
-            <Label text="Features Input Vector" />
-            <TextArea fx:id="InputsVectorTA" prefHeight="200.0" prefWidth="50.0">
-               <font>
-                  <Font name="System Bold" size="6.0" />
-               </font>
-            </TextArea>
-            <Label text="Perceptron Weights" />
-            <TextArea fx:id="WeightsVectorTA" prefHeight="200.0" prefWidth="50.0">
-               <font>
-                  <Font name="System Bold" size="6.0" />
-               </font>
-            </TextArea>
          </children>
-      </HBox>
+      </VBox>
    </children>
 </AnchorPane>

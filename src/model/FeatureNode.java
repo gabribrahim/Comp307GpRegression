@@ -5,6 +5,8 @@ import java.util.ArrayList;
 public class FeatureNode extends BasePNode{
 	
 	public ArrayList<Pixel> inputPixels; // might prove useful while debugging & visualizing features
+	public FullImage originalImage;
+	
 	
 	@Override
 	public String toString() {
@@ -34,11 +36,20 @@ public class FeatureNode extends BasePNode{
 	}
 	
 	public void computedWeightedSum() {
-		// Calculate the sum of weighted inputs
+		// Calculate the sum of weighted inputs	
+		weightedSum						= 0.0;
+		for (Pixel input : inputPixels) {
+			int index					= inputPixels.indexOf(input);
 		
-		for (BasePNode input : inputs) {
-			int index					= inputs.indexOf(input);
-			weightedSum					+= input.output * weights.get(index);
+			if (originalImage.imagePixelsBools[input.x][input.y] == input.sign) {
+				weightedSum++;
+				weights.add(index, 1.0);
+				
+			}
+			else {
+				weights.add(index, 0.0);
+			}
+			
 		}
 	}
 	
