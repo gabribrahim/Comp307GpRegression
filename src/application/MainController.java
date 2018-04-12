@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -30,6 +33,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -75,7 +79,7 @@ public class MainController {
 	private GraphicsContext inputLayerGc		= inputLayerCanvas.getGraphicsContext2D();	
 	private BasePNode perceptronNode;
 	private int totalEpochsCount				= 0;
-	private HashMap<Integer, Double> learningcurve=new HashMap<>();
+	private LinkedHashMap<Integer, Double> learningcurve=new LinkedHashMap<>();
     private NumberAxis xAxis 					= new NumberAxis();
     private NumberAxis yAxis 					= new NumberAxis();
     private LineChart<Number,Number> lineChart  = new LineChart<Number,Number>(xAxis,yAxis);
@@ -114,6 +118,7 @@ public class MainController {
 	}
 	public void debug() {
 		int hits = 0;		
+		System.out.println("Image "+debugImageIndex+",Error,Input,weightBeforeChange,Weight,W * I,LR,New Weight");
 		FullImage currentImage			= myDataLoader.trainingDataSetList.get(debugImageIndex);
 		perceptronNode.learningRate		= Double.parseDouble(LearningRateTF.getText());
 		perceptronNode.originalImage	= currentImage;
@@ -121,6 +126,7 @@ public class MainController {
 		perceptronNode.setInputs(currentImage.imageFeatures);
 		perceptronNode.getOutput();
 		perceptronNode.tweakWeights();
+		WeightsVectorTA.setText(perceptronNode.getWeightVectorSring());
 		if (perceptronNode.error==0) {hits++;}
 		System.out.println();
 		System.out.println(debugImageIndex + " " + currentImage.labelName + " Error= "+perceptronNode.error
@@ -134,36 +140,43 @@ public class MainController {
 		int numberOfEpochs						= Integer.parseInt(EpochsTF.getText());
 		perceptronNode.learningRate				= Double.parseDouble(LearningRateTF.getText());
 		perceptronNode.debug					= false;
+		double minAccuracy						= 1.0;
+		double maxAccuracy						= 0.0;
 		for (int k=0; k<numberOfEpochs; k++) {
 			int hits							= 0;
 			int totalError						= 0;
 			totalEpochsCount = totalEpochsCount+1;
 			for (int i=0; i<myDataLoader.trainingDataSetList.size();i++) {
+				StatusLB.setText("Input Vector Length = "+perceptronNode.inputs.size()
+								+" - Wieghts Vector Length = "+ perceptronNode.weights.size());
 				FullImage currentImage			= myDataLoader.trainingDataSetList.get(i);
 				perceptronNode.setInputs(currentImage.imageFeatures);
 				perceptronNode.originalImage	= currentImage;
 				perceptronNode.getOutput();
 				perceptronNode.tweakWeights();
-				totalError						+= perceptronNode.error;
+				totalError						+= Math.abs(perceptronNode.error);
 				if( perceptronNode.error == 0) {hits++;}
 				WeightsVectorTA.setText(perceptronNode.getWeightVectorSring());
 				StatusTA.setText("Trained Perceptron On Image Index " + i + "\nImage Class = " + currentImage.labelName
 								+"\nWeightedSum = "+perceptronNode.weightedSum
 								+"\nOutput = "+perceptronNode.output
 								+"\nError = "+perceptronNode.error);
-					
-				
 			}			
 			double accuracy						= (double)hits / (double)myDataLoader.trainingDataSetList.size();
 			double learningError				= 1-accuracy;
-			StatusTA.setText("Accuracy @ Epoch " + totalEpochsCount + " = " + accuracy + "Hits = " + hits+"\n"
-								+"Total Error = "+totalError+"\n");
+			if (accuracy>maxAccuracy) {maxAccuracy=accuracy;}
+			if (accuracy<minAccuracy) {minAccuracy=accuracy;}
+			
+			StatusTA.setText("Accuracy @ Epoch " + totalEpochsCount + " = " + accuracy + "\nHits = " + hits+"\n"
+								+"Total Error = "+totalError+"\n"
+								+"Best Pass   = "+ maxAccuracy+"\n"
+								+"Worst Pass  = "+ minAccuracy);
 			if (hits==myDataLoader.trainingDataSetList.size()) {break;}
 			System.out.println(accuracy+","+learningError);
 			learningcurve.put(totalEpochsCount, learningError);
 			
 		}
-		drawLearningCurve();
+		drawLearningCurve(0.01);
 	}
 	public void setupLearningCurveChart() {
         xAxis.setLabel("Epoch");
@@ -176,10 +189,29 @@ public class MainController {
 		lineChart.setVerticalGridLinesVisible(true);        
 
 	}
-	public void drawLearningCurve() {
+	public void resampleLearningCurve() {
+		TextInputDialog dialog = new TextInputDialog("0.01");
+		dialog.setTitle("Resample Learning Curve");
+		dialog.setHeaderText("fraction of points to Skip");
+		dialog.setContentText("double fraction = ");
+
+		// Traditional way to get the response value.
+		Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()){
+			drawLearningCurve(Double.parseDouble(result.get()));
+		}		
+		
+	}
+	public void drawLearningCurveUI(){
+		drawLearningCurve(0.01);
+	}
+	public void drawLearningCurve(double fractionOfPointsToKeep) {
 		lineChart.getData().clear();
+		Map.Entry<Integer,Double> firstEntry					= (Map.Entry<Integer,Double>) learningcurve.entrySet().toArray()[0];		
 		XYChart.Series<Number,Number> series 	= new XYChart.Series<>();
-		double pointsToSkip						= learningcurve.size()*0.01;
+		series.getData().add(new XYChart.Data(firstEntry.getKey(), firstEntry.getValue()));
+		double pointsToSkip						= learningcurve.size()*fractionOfPointsToKeep;
+		System.out.println(pointsToSkip);
 		Iterator iter							=learningcurve.entrySet().iterator();
 		while(iter.hasNext()) {
 			Map.Entry<Integer,Double> point		= (Map.Entry)iter.next();
@@ -188,6 +220,10 @@ public class MainController {
 				if(iter.hasNext()) {iter.next();}
 			}
 		}
+		
+		Map.Entry<Integer,Double> lastEntry					= (Map.Entry<Integer,Double>) learningcurve.entrySet().toArray()[0];		
+		series.getData().add(new XYChart.Data(lastEntry.getKey(), lastEntry.getValue()));
+
 		lineChart.getData().add(series);
 		
 	}
@@ -390,7 +426,7 @@ public class MainController {
 		// Loads Images From Disk 
 		totalEpochsCount			= 0;
 		learningcurve.clear();
-		System.out.println("Loading Images DataSet");
+//		System.out.println("Loading Images DataSet");
 		int pixelCount				= Integer.parseInt(PixelCountTF.getText());
 		int featureCount			= Integer.parseInt(FeaturesCountTF.getText());
 		int randomSeed				= Integer.parseInt(RandomTF.getText());

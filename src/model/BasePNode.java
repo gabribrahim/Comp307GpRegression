@@ -56,8 +56,11 @@ public class BasePNode {
 	public void tweakWeights() {
 		// Edit Weights according to the error
 		double weight;
-		for (int i=0; i<weights.size(); i++) {
+		double weightBeforeChange;
+		for (int i=0; i<inputs.size(); i++) {
 			weight						= weights.get(i);
+			weightBeforeChange			= new Double(weights.get(i));
+			double weightInput			= weight*inputs.get(i).output;
 //			System.out.print("weight before"+weight + " LearningR"+learningRate+" >> ");
 //			if (error!=0 && labelMapping.get(originalImage.labelName)==1.0)
 //				weight						= weight + inputs.get(i).output*learningRate;
@@ -69,6 +72,7 @@ public class BasePNode {
 			weight						= weight + (learningRate*(error*inputs.get(i).output));
 			weights.set(i, weight);
 //			System.out.println(" weight After"+weights.get(i));
+			debugPrint(","+error+","+inputs.get(i).output+ ","+weightBeforeChange+"," + weights.get(i)+","+weightInput+","+learningRate+","+weight);
 		}
 		
 	}
@@ -88,7 +92,7 @@ public class BasePNode {
 			int input_index				= inputs.indexOf(input);
 //			input.getOutput();
 			weightedSum					+= input.output * weights.get(input_index);
-			debugPrint(input.output + "," + weights.get(input_index)+","+learningRate);
+			
 		}
 	}
 	

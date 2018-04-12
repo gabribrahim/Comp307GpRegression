@@ -84,7 +84,7 @@ public class FullImage{
 	if (randomSeed==0) {randomGen= new Random();}
 	else {randomGen= new Random(randomSeed);}
 	
-	System.out.println(randomSeed);
+//	System.out.println(randomSeed);
 	int fCounter							= 0;
 	while (fCounter<featuresCount) {
 			ArrayList<Pixel> pixels			= new ArrayList<>();
