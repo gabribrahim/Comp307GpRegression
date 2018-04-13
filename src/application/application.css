@@ -51,6 +51,14 @@ linear-gradient(to bottom, derive(-fx-base,+50%), derive(-fx-base,-40%), derive(
     -fx-shape: "M2,0 L5,4 L8,0 L10,0 L10,2 L6,5 L10,8 L10,10 L8,10 L5,6 L2,
     10 L0,10 L0,8 L4,5 L0,2 L0,0 Z";
     }
+    
+.default-color4.chart-symbol { /*Clusters */
+    -fx-background-color: rgb(255,108,0);
+    -fx-background-radius: 10;
+    -fx-padding: 3px ;
+    -fx-background-insets: 0;
+
+    }     
 .canvas {
     -fx-background-color: antiquewhite, white ;
     -fx-background-insets: 0, 20 ;
