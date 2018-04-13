@@ -99,7 +99,7 @@ public class BasePNode {
 	
 	public void generateWeights() {
 		// Clears Current Weights & Assigns a random double between 0 & 1 to each input
-		Random randomGen				= new Random(1);
+		Random randomGen				= new Random();
 		for(int i =0; i<inputs.size(); i++) {
 			double randomValue = -0.1 + (0.1 - -0.1) * randomGen.nextDouble();
 
