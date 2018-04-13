@@ -17,7 +17,7 @@ public class FeatureNode extends BasePNode{
 			
 			rep 						+= "Input "+index+" Value = "+input.output+" Weight = "+weights.get(index)+"\n";
 			rep 						+= pixel.toString()+"\n";
-			rep 						+= "               "+originalImage.imagePixelsBools[pixel.x][pixel.y]+"\n";
+//			rep 						+= "               "+originalImage.imagePixelsBools[pixel.x][pixel.y]+"\n";
 		}
 		rep 							+= "Weighted Sum = "+weightedSum+" \n Output = "+output+"\n";
 		return rep;

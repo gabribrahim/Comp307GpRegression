@@ -15,7 +15,7 @@
 
 <AnchorPane fx:id="RootAP" prefHeight="685.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <children>
-      <VBox prefHeight="685.0" prefWidth="1030.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <VBox fx:id="SnapShotPreviewVB" prefHeight="685.0" prefWidth="1030.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
             <Label id="MainLabel" fx:id="MainLabel" prefHeight="64.0" prefWidth="1004.0" text="Assignment 1 Question 3">
                <font>
@@ -32,7 +32,7 @@
                         <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#debug" prefWidth="755.0" text="Test Current IMG" />
                         <Button alignment="BOTTOM_LEFT" mnemonicParsing="false" onAction="#trainPerceptronForEpochs" prefWidth="755.0" text="Train For K Epochs" />
                         <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#resampleLearningCurve" prefWidth="755.0" text="Resample Learning Curve" />
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#saveSnapShot" prefWidth="755.0" text="Save Tree To PNG" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#saveSnapShot" prefWidth="755.0" text="Save SnapShot" />
                         <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#checkCordinates" prefHeight="39.0" prefWidth="274.0" text="Check Image Co-ordinate" />
                         <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="457.0" prefWidth="755.0" wrapText="true" VBox.vgrow="ALWAYS" />
                      </children>

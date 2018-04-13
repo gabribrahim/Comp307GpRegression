@@ -70,6 +70,7 @@ public class MainController {
 	@FXML TextField LearningRateTF;
 	@FXML VBox LearningCurveBox;
 	@FXML TextField RandomTF;
+	@FXML VBox SnapShotPreviewVB;
 	private Main main;
 	private DataSetsLoader myDataLoader = new DataSetsLoader();
 	private Canvas imageCanvas 				= new Canvas(10, 10);
@@ -214,7 +215,6 @@ public class MainController {
 		XYChart.Series<Number,Number> series 	= new XYChart.Series<>();
 		series.getData().add(new XYChart.Data(firstEntry.getKey(), firstEntry.getValue()));
 		double pointsToSkip						= learningcurve.size()*fractionOfPointsToKeep;
-		System.out.println(pointsToSkip);
 		Iterator iter							=learningcurve.entrySet().iterator();
 		while(iter.hasNext()) {
 			Map.Entry<Integer,Double> point		= (Map.Entry)iter.next();
@@ -304,18 +304,7 @@ public class MainController {
 		
 		FullImage imageInstance			= myDataLoader.trainingDataSetList.get(imageIndex);
 		PixelWriter pw					= imageGc.getPixelWriter();
-		for (int y=0;y<10;y++) {
-			for  (int x=0;x<10;x++){
-				boolean pixelSign		= imageInstance.imagePixelsBools[x][y];
-				if (pixelSign) {System.out.print("X");}
-				else {System.out.print("O");}
-			}
-			System.out.println();
-			
-		}
-		System.out.println("_____________________________________________");
-		System.out.println(imageInstance.featureListAsValues+"\n"+imageInstance.featureListAsValues.size()
-		+"\n"+imageInstance.labelName);
+
 		// SHOW INPUT VECTOR FOR IMAGE FEATURES
 		InputsVectorTA.setText(imageInstance.getInputVector());
 		// DRAW IMAGE IN IMAGE PREVIEW CANVAS
@@ -508,7 +497,7 @@ public class MainController {
 	
 	public void saveAsPng(String fileName) {
 		double scale							= 5;
-		Bounds bounds 							= TreeSnapShot.getLayoutBounds();
+		Bounds bounds 							= SnapShotPreviewVB.getLayoutBounds();
 		WritableImage image 					= new WritableImage(
 	            (int) Math.round(bounds.getWidth() * scale),
 	            (int) Math.round(bounds.getHeight() * scale));
@@ -519,7 +508,7 @@ public class MainController {
 		
 //	    WritableImage image2 					= TreeP.snapshot(snapshotParams,null);
     	
-	    ImageView view 							= new ImageView(TreeSnapShot.snapshot(snapshotParams, image));
+	    ImageView view 							= new ImageView(SnapShotPreviewVB.snapshot(snapshotParams, image));
 	    File file = new File(fileName+".png");
 	    
 	    try {
@@ -529,7 +518,7 @@ public class MainController {
 	    }
 	}	
 	public void saveSnapShot() {
-		saveAsPng("DTree_" + GeniThresholdTF.getText()+"_geniThreshold");
+		saveAsPng("LR_" + LearningRateTF.getText()+"_TotalEpochs_"+totalEpochsCount);
 	}
 		
 }
