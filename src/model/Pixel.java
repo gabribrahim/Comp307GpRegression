@@ -16,7 +16,7 @@ public class Pixel {
 	}
 	@Override
 	public String toString() {
-		return "Pixel [x=" + x + ", y=" + y + ", sign=" + sign + "]";
+		return "P[x=" + x + ",y=" + y + ",sign=" + sign + "]";
 	}
 	
 

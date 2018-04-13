@@ -3,6 +3,7 @@ package application;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -92,6 +93,7 @@ public class MainController {
         drawFeature(0, 0);
         drawAllFeatures();    
         createPerceptron();
+        Collections.shuffle(myDataLoader.trainingDataSetList);
 	}
 	
 	public void createPerceptron() {
@@ -146,6 +148,7 @@ public class MainController {
 			int hits							= 0;
 			int totalError						= 0;
 			totalEpochsCount = totalEpochsCount+1;
+			Collections.shuffle(myDataLoader.trainingDataSetList);
 			for (int i=0; i<myDataLoader.trainingDataSetList.size();i++) {
 				StatusLB.setText("Input Vector Length = "+perceptronNode.inputs.size()
 								+" - Wieghts Vector Length = "+ perceptronNode.weights.size());
@@ -301,7 +304,18 @@ public class MainController {
 		
 		FullImage imageInstance			= myDataLoader.trainingDataSetList.get(imageIndex);
 		PixelWriter pw					= imageGc.getPixelWriter();
-		
+		for (int y=0;y<10;y++) {
+			for  (int x=0;x<10;x++){
+				boolean pixelSign		= imageInstance.imagePixelsBools[x][y];
+				if (pixelSign) {System.out.print("X");}
+				else {System.out.print("O");}
+			}
+			System.out.println();
+			
+		}
+		System.out.println("_____________________________________________");
+		System.out.println(imageInstance.featureListAsValues+"\n"+imageInstance.featureListAsValues.size()
+		+"\n"+imageInstance.labelName);
 		// SHOW INPUT VECTOR FOR IMAGE FEATURES
 		InputsVectorTA.setText(imageInstance.getInputVector());
 		// DRAW IMAGE IN IMAGE PREVIEW CANVAS
@@ -364,6 +378,27 @@ public class MainController {
 		new Thread(task).start();
 		drawAllInputsOfDataSet();
 	}
+	public void checkCordinates() {
+		TextInputDialog dialog = new TextInputDialog("5,5");
+		dialog.setTitle("Draw Pixel On Image");
+		dialog.setHeaderText("Please provide a pixel seperated by a comma Example Below:\n 9,1");
+		dialog.setContentText("x,y= ");
+
+		// Traditional way to get the response value.
+		int imageIndex					= (int)ImageSelectorSL.getValue();
+		FullImage imageInstance			= myDataLoader.trainingDataSetList.get(imageIndex);
+		Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()){			
+			PixelWriter pw2					= imageGc.getPixelWriter();
+			String[] pixel						= result.get().split(",");
+			int x							= Integer.parseInt(pixel[0]);
+			int y							= Integer.parseInt(pixel[1]);
+			pw2.setColor(x, y, Color.GREEN);
+			System.out.println(imageInstance.imagePixelsBools[x][y]);
+			System.out.println(imageInstance.imagePixels[x][y]);
+			
+		}			
+	}
 	public void drawFeature(int imageIndex ,int featureIndex) {
 		
 		featureGc.clearRect(0, 0, 10, 10);
@@ -372,6 +407,7 @@ public class MainController {
 		PixelWriter pw2					= featureGc.getPixelWriter();
 		FullImage imageInstance			= myDataLoader.trainingDataSetList.get(imageIndex);
 		FeatureNode	featureOfImage		= imageInstance.imageFeatures.get(featureIndex);
+//		System.out.println(featureOfImage);
 		// DRAW IMAGE
 		
 		for (ArrayList<Integer>pixel :imageInstance.getPixels()) {
@@ -389,7 +425,8 @@ public class MainController {
 		// Draw Feature Pixels
 		StatusTA.setText(featureOfImage.toString());
 		for (model.Pixel pixel : featureOfImage.inputPixels) {
-				if (pixel.sign==imageInstance.imagePixelsBools[pixel.x][pixel.y]) {
+				if (pixel.sign== imageInstance.imagePixelsBools[pixel.x][pixel.y]) {
+//				if (pixel.sign) {	
 					pw2.setColor(pixel.x, pixel.y, Color.BLUE);
 				}
 				else {

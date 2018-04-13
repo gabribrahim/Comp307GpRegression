@@ -43,7 +43,7 @@ public class FullImage{
 				if (substring==null) {continue;}
 				featureListAsValues.add(Integer.parseInt(substring));				
 				if (substring.equals("1")) {featureListAsBools.add(true);}
-				if (substring.equals("1")) {featureListAsBools.add(false);}
+				if (substring.equals("0")) {featureListAsBools.add(false);}
 			}
 		}
 
@@ -51,7 +51,7 @@ public class FullImage{
 		int row								= 0;
 		int col								= 0;
 		for (int pixelValue : featureListAsValues) {
-			imagePixels[row][col]			=pixelValue;			
+			imagePixels[col][row]			=pixelValue;			
 			col ++;
 			if (col==10) {col=0;row++;}
 			
@@ -60,7 +60,7 @@ public class FullImage{
 		row									= 0;
 		col									= 0;
 		for (boolean pixelValue : featureListAsBools) {
-			imagePixelsBools[row][col]			=pixelValue;			
+			imagePixelsBools[col][row]			=pixelValue;			
 			col ++;
 			if (col==10) {col=0;row++;}
 			
@@ -69,37 +69,21 @@ public class FullImage{
 		
 	}
 	
-	public Pixel getValidRandomPixel(Random randomGen) {
-		// Cast Random column, row,bolean in a pixel
-//		boolean valid						= false;
-		boolean sign 						= randomGen.nextBoolean();
-		int row 							= randomGen.nextInt(10);
-		int col 							= randomGen.nextInt(10);		
-		Pixel pixel							= new Pixel(row,col,sign);
-		return pixel;
-	}
-	public void generateFeatures() {
-	imageFeatures.clear();
-	Random randomGen;
-	if (randomSeed==0) {randomGen= new Random();}
-	else {randomGen= new Random(randomSeed);}
-	
-//	System.out.println(randomSeed);
-	int fCounter							= 0;
-	while (fCounter<featuresCount) {
-			ArrayList<Pixel> pixels			= new ArrayList<>();
+
+	public void generateFeatures(FeatureSelectionMap selection) {
+		// Generate Feature Nodes For Image
+		// Given The predefined Feature Selection Map
+	imageFeatures.clear(); 
+	for (int featureIndex : selection.featuresMap.keySet()){
+			ArrayList<Pixel> pixels			= selection.featuresMap.get(featureIndex);
 			FeatureNode imageFeature		= new FeatureNode(pixels);
-			for (int i=0; i<pixelsCountPerFeature; i++) {
-				Pixel randomValidPixel		= getValidRandomPixel(randomGen);
-				pixels.add(randomValidPixel);
-				BasePNode featurePixelInput = new BasePNode();
+			for (int i=0; i<pixels.size();i++) {
+				BasePNode featurePixelInput = new BasePNode(); // Always Adding A dummy Pixel Node with output to 1
 				featurePixelInput.setOutput(1);
 				imageFeature.inputs.add(featurePixelInput);				
 			}
-//			System.out.println(imageFeature);
-			fCounter++;
 			imageFeature.originalImage		= this;
-			imageFeature.getOutput();
+			imageFeature.getOutput();  // Runs the activation function in the hand out more details in function
 			imageFeatures.add(imageFeature);
 		}
 	}
@@ -109,9 +93,9 @@ public class FullImage{
 		for (int row=0; row<10; row++) {
 			for (int col=0; col<10; col++) {
 				ArrayList<Integer> pixel     = new ArrayList<>();
-				pixel.add(row);
 				pixel.add(col);
-				pixel.add(imagePixels[row][col]);
+				pixel.add(row);
+				pixel.add(imagePixels[col][row]);
 				pixels.add(pixel);			
 				}
 		}

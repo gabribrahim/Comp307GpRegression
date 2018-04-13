@@ -45,6 +45,8 @@ public class DataSetsLoader {
 	public String loadImageDataSet(String filePath, ArrayList<FullImage> dataSetList) {		
 		
 		File fileObj 								= new File(filePath);
+		FeatureSelectionMap selection				= new FeatureSelectionMap(randomSeed, pixelCountPerFeature, featureCountPerImage);
+		selection.generatePixelSelectionSet();
 		//Reading File Contents & Creating Java Representation Objects for DataSet For Classifier Classes//
 		try (FileReader fileReader = new FileReader(fileObj);
 				BufferedReader bufferedReader		= new BufferedReader(fileReader);){
@@ -53,20 +55,18 @@ public class DataSetsLoader {
 			List <String>lineParts				    = new ArrayList<>(); 
 			while(line!= null) {
 				line								= bufferedReader.readLine();
-//				System.out.println(line);
-				while (!line.startsWith("P1")) { //Keeps Iterating & Fills LineParts with 0s & 1s till theline is P1					
+				while (!line.startsWith("P1")) { //Keeps Iterating & Fills LineParts with 0s & 1s till the line is P1					
 					for (Scanner s = new Scanner(line); s.hasNext();) lineParts.add(s.next());
 					line							= bufferedReader.readLine();
 					if (line==null) {break;}					
 				}
 				if (lineParts.size()>0) {					
 					FullImage imageInstance			= new FullImage(new ArrayList<String>(lineParts),labelName);
-//					System.out.println(lineParts);
-					imageInstance.parseInformationToValues();
-					imageInstance.featuresCount		= featureCountPerImage;
-					imageInstance.pixelsCountPerFeature= pixelCountPerFeature;
-					imageInstance.randomSeed		= randomSeed;
-					imageInstance.generateFeatures();
+					imageInstance.parseInformationToValues(); // Creates ArrayList of Integers & Booleans
+					imageInstance.featuresCount		= featureCountPerImage; // Inheriting the feature count from the UI
+					imageInstance.pixelsCountPerFeature= pixelCountPerFeature; // Inheriting the pixel count from the UI
+					imageInstance.randomSeed		= randomSeed; // Inheriting the randomSeed from the UI					
+					imageInstance.generateFeatures(selection); // Generates Features Via Randomly Predefined Pixel Selection Map
 					dataSetList.add(imageInstance);
 					lineParts.clear();
 				}				
@@ -74,9 +74,8 @@ public class DataSetsLoader {
 				if (line.startsWith("P1")) { // if Line is P1 Then Get Label Name
 					labelName						= bufferedReader.readLine();
 					dataSetClasses.add(labelName);
-//					System.out.println(labelName);
 					line							= bufferedReader.readLine(); // Read Count of Rows & Columns Lines Which I am hard coding
-//					System.out.println(line);
+
 				}
 
 

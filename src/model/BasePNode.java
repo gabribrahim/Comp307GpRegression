@@ -13,9 +13,9 @@ public class BasePNode {
 	public Double learningRate			= 1.0;
 	public Double weightedSum			= 0.0;
 	public Double error					= 0.0;
-	public Double error_afterWtweak		= 0.0; //ErrorAfter tweaking weights
-	public Double output_afterWtweak	= 0.0; //Output After tweaking weights
-	public boolean debug				= false;
+	public Double error_afterWtweak		= 0.0; //ErrorAfter tweaking weights For DEBUG
+	public Double output_afterWtweak	= 0.0; //Output After tweaking weights For DEBUG
+	public boolean debug				= false; // When True the some print statements are enabled.
 	private HashMap<String, Double> labelMapping = new HashMap<>();
 	public BasePNode() {
 		super();
@@ -42,7 +42,6 @@ public class BasePNode {
 		biasNode.setOutput(1.0);
 		featurelist.add(0, biasNode);
 		inputs							= featurelist;
-//		System.out.println("Inputs & Bias = "+inputs.size());
 	}
 	public void getOutput() {
 		//Run the activation function on the WieghtedSum of Inputs
