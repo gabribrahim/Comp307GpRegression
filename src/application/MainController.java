@@ -31,6 +31,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import model.DataSetsLoader;
+import model.Processor;
 
 
 public class MainController {
@@ -62,12 +63,12 @@ public class MainController {
 	private DataSetsLoader myDataLoader = new DataSetsLoader();
 	private int totalEpochsCount				= 0;
 	private LinkedHashMap<Integer, Double> learningcurve=new LinkedHashMap<>();
-
+	private Processor myModel			= new Processor();
 	public void setMain(Main main) {
 		this.main = main;
 
-        loadDataSet();
-
+//        loadDataSet();
+        myModel.buildNNTest();
 	}
 	
 	public void loadDataSet() {

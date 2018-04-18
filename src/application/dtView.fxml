@@ -27,13 +27,7 @@
                   <VBox prefHeight="457.0" prefWidth="259.0">
                      <children>
                         <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="39.0" prefWidth="755.0" text="Load Images" />
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#drawAllInputsOfDataSet" prefWidth="755.0" text="Draw All Features In DataSet" />
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#createPerceptron" prefHeight="39.0" prefWidth="755.0" text="Create Perceptron" />
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#debug" prefWidth="755.0" text="Test Current IMG" />
-                        <Button alignment="BOTTOM_LEFT" mnemonicParsing="false" onAction="#trainPerceptronForEpochs" prefWidth="755.0" text="Train For K Epochs" />
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#resampleLearningCurve" prefWidth="755.0" text="Resample Learning Curve" />
                         <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#saveSnapShot" prefWidth="755.0" text="Save SnapShot" />
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#checkCordinates" prefHeight="39.0" prefWidth="274.0" text="Check Image Co-ordinate" />
                         <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="457.0" prefWidth="755.0" wrapText="true" VBox.vgrow="ALWAYS" />
                      </children>
                   </VBox>
