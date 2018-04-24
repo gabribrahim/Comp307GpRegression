@@ -3,8 +3,10 @@ package application;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
@@ -19,15 +21,18 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import model.DataSetsLoader;
@@ -37,46 +42,97 @@ import model.Processor;
 public class MainController {
 	// UI ELEMENTS
 	@FXML TextArea StatusTA;
-	@FXML Label MainLabel;	
-	@FXML SwingNode TreeP;
-	@FXML HBox ChartBox;
-	@FXML TextField GeniThresholdTF;
+	@FXML Label MainLabel;		
 	@FXML Label StatusLB;
-	@FXML VBox TreeSnapShot;
-	@FXML Slider ImageSelectorSL;
-	@FXML Slider FeatureSelectorSL;
 	@FXML HBox PreviewHB;
-	@FXML Group ImagePrevGRP;
-	@FXML Group FeaturePrevGRP;
-	@FXML Group AllInputsPreviewGRP;
 	@FXML TextField HiddenLayersCountTF;
 	@FXML TextField NeurounsCountPerHlayerTF;
-	@FXML TextArea InputsVectorTA;
-	@FXML TextArea WeightsVectorTA;
-	@FXML ScrollPane AllInputsPreviewPN;
 	@FXML TextField EpochsTF;
 	@FXML TextField LearningRateTF;
 	@FXML VBox LearningCurveBox;
 	@FXML TextField MomentumTF;
 	@FXML VBox SnapShotPreviewVB;
 	private Main main;
+    private NumberAxis xAxis 					= new NumberAxis();
+    private NumberAxis yAxis 					= new NumberAxis();
+    private LineChart<Number,Number> lineChart  = new LineChart<Number,Number>(xAxis,yAxis);	
 	public DataSetsLoader myDataLoader = new DataSetsLoader();
 	private int totalEpochsCount				= 0;
-	private LinkedHashMap<Integer, Double> learningcurve=new LinkedHashMap<>();
+	public LinkedHashMap<Integer, Double> learningcurve=new LinkedHashMap<>();
 	private Processor myModel;			
+	
 	public void setMain(Main main) {
 		this.main = main;
 
 //        loadDataSet();
 		myModel							= new Processor(this);
+		setupLearningCurveChart();
+		LearningCurveBox.getChildren().add(lineChart);
+		LearningCurveBox.setVgrow(lineChart, Priority.ALWAYS);
 		myDataLoader.loadIrisDataSet(System.getProperty("user.dir").replace('\\', '/') + "/iris-training.txt",myDataLoader.trainingDataSetList);
 		myDataLoader.writeIrisDataSetForNN();
         myModel.buildNNTest();        
         
 	}
 	public void buildNNFromUiAttrs() {
+		myModel.epochsCounter=0;
+		learningcurve.clear();
 		myModel.buildNNTest2(Integer.parseInt(HiddenLayersCountTF.getText()),Integer.parseInt(NeurounsCountPerHlayerTF.getText()));
+		appendToStatusText("Biult New NN\n HiddenLayers="+HiddenLayersCountTF.getText()
+		+"\nNeuronsPerHiddenLayer="+NeurounsCountPerHlayerTF.getText());
 	}
+	
+	public void resampleLearningCurve() {
+		TextInputDialog dialog = new TextInputDialog("0.01");
+		dialog.setTitle("Resample Learning Curve");
+		dialog.setHeaderText("fraction of points to Skip");
+		dialog.setContentText("double fraction = ");
+
+		// Traditional way to get the response value.
+		Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()){
+			drawLearningCurve(Double.parseDouble(result.get()));
+		}		
+		
+	}	
+	public void drawLearningCurveUI(){
+		drawLearningCurve(0.0);
+	}	
+	
+	public void drawLearningCurve(double fractionOfPointsToKeep) {
+		lineChart.getData().clear();
+		Map.Entry<Integer,Double> firstEntry					= (Map.Entry<Integer,Double>) learningcurve.entrySet().toArray()[0];		
+		XYChart.Series<Number,Number> series 	= new XYChart.Series<>();
+		series.getData().add(new XYChart.Data(firstEntry.getKey(), firstEntry.getValue()));
+		double pointsToSkip						= learningcurve.size()*fractionOfPointsToKeep;
+		Iterator iter							=learningcurve.entrySet().iterator();
+		while(iter.hasNext()) {
+			Map.Entry<Integer,Double> point		= (Map.Entry)iter.next();
+			series.getData().add(new XYChart.Data(point.getKey(), point.getValue()));
+			for(int i=0; i<(int)pointsToSkip;i++) {
+				if(iter.hasNext()) {iter.next();}
+			}
+		}
+		
+		Map.Entry<Integer,Double> lastEntry					= (Map.Entry<Integer,Double>) learningcurve.entrySet().toArray()[0];		
+		series.getData().add(new XYChart.Data(lastEntry.getKey(), lastEntry.getValue()));
+
+		lineChart.getData().add(series);
+		
+	}	
+	public void setupLearningCurveChart() {
+        xAxis.setLabel("Epoch");
+        yAxis.setLabel("Error");        
+//        lineChart.setTitle("Learning Curve");
+        lineChart.setCreateSymbols(false);
+        lineChart.setAnimated(false);
+        lineChart.getXAxis().setAutoRanging(true);
+		lineChart.getYAxis().setAutoRanging(true);
+		lineChart.setVerticalGridLinesVisible(true);   
+		
+
+	}
+	
 	public double getLearningRate() {
 		return Double.parseDouble(LearningRateTF.getText());
 	}
@@ -89,6 +145,7 @@ public class MainController {
 	}
 	public void runNN() {
 		myModel.run();
+		
 	}
 	public void appendToStatusText(String message) {
 		StatusTA.setText(message+"\n");

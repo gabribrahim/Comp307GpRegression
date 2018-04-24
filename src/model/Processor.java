@@ -22,6 +22,7 @@ public class Processor implements org.joone.engine.NeuralNetListener{
 	private double learningRate;
 	private double momentum;
 	private int epochs;
+	public int epochsCounter=0;
 	public int nodesPerLayerCount;
 	HashMap<Integer, SimpleLayer> layersMap = new HashMap<>();
 	public Processor(MainController uiWin) {
@@ -94,7 +95,7 @@ public class Processor implements org.joone.engine.NeuralNetListener{
 		nnet.setTeacher(trainer);
 		
 		output.addOutputSynapse(trainer);
-		monitor.setTrainingPatterns(75); /* # of rows contained in the input file */
+		monitor.setTrainingPatterns(uiWin.myDataLoader.trainingDataSetList.size()); /* # of rows contained in the input file */
 		monitor.setTotCicles(10000); /* How many times the net must be trained on the input patterns */
 		monitor.setLearning(true); /* The net must be trained */
 //		System.out.println(monitor.getGlobalError());
@@ -177,12 +178,13 @@ public class Processor implements org.joone.engine.NeuralNetListener{
 
 	@Override
 	public void cicleTerminated(NeuralNetEvent e) {
+		epochsCounter++;
 		Monitor m = (Monitor)e.getSource();
 		String message = "Momentum="+m.getMomentum()+"\nLearning Rate = "+m.getLearningRate()+"\nGlobal Error = "+m.getGlobalError()+"\n"
-						+"Current Epoch ="+m.getCurrentCicle()+"\nLayersInNetwork="+layersMap+"\nNodesPerHiddenLayer="
+						+"Current Epoch ="+epochsCounter+"\nLayersInNetwork="+layersMap+"\nNodesPerHiddenLayer="
 						+nodesPerLayerCount;
 		Platform.runLater(()->uiWin.appendToStatusText(message));
-		
+		uiWin.learningcurve.put(epochsCounter, m.getGlobalError());
 		
 //		uiWin.appendToStatusText(m.getGlobalError()+","+m.getCurrentCicle());
 //		System.out.println(m.getGlobalError()+","+m.getCurrentCicle());
@@ -191,7 +193,7 @@ public class Processor implements org.joone.engine.NeuralNetListener{
 
 	@Override
 	public void netStopped(NeuralNetEvent e) {
-		// TODO Auto-generated method stub
+		Platform.runLater(()->uiWin.drawLearningCurveUI());
 		
 	}
 
