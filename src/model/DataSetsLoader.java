@@ -4,8 +4,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,15 +19,12 @@ import java.util.Scanner;
 public class DataSetsLoader {	
 	ArrayList<Float> minValuesForFeatures			= new ArrayList<Float>();
 	ArrayList<Float> maxValuesForFeatures			= new ArrayList<Float>();	
-	public HashSet<String> dataSetClasses			= new HashSet<>();
+	public LinkedHashSet<String> dataSetClasses		= new LinkedHashSet<>();
 	public BaseClassifier myclassifier;
 	public String dataSetName;
 	public HashSet<String> dataSetAttrsLabels		= new HashSet<>();
-	public int pixelCountPerFeature					= 4;
-	public int featureCountPerImage					= 50;
-	public int randomSeed							= 0;
-	private ArrayList<LabelledDataInstance> testDataSetList;
-	private ArrayList<LabelledDataInstance> trainingDataSetList;
+	public ArrayList<LabelledDataInstance> testDataSetList =new ArrayList<>();
+	public ArrayList<LabelledDataInstance> trainingDataSetList =new ArrayList<>();
 	
 	@Override
 	public String toString() {
@@ -40,6 +43,57 @@ public class DataSetsLoader {
 		this.maxValuesForFeatures.clear();
 	}
 	
+	public void writeIrisDataSetForNN() {
+		ArrayList<String> classes 					= new ArrayList<>(dataSetClasses);
+		
+		List<String> lines 							=new ArrayList<String>();
+		for (LabelledDataInstance instance:trainingDataSetList) {
+			String line								="";
+			for (String value :instance.featuresListAsStrings) {
+				line								+=value+";";
+			}
+			line									+=classes.indexOf(instance.labelName);
+			lines.add(line);
+			System.out.println("AddingLIne>>"+line);
+		}
+		Path file = Paths.get("irisDataNN.txt");
+		try {
+			Files.write(file, lines, Charset.forName("UTF-8"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	public String loadIrisDataSet(String filePath, ArrayList<LabelledDataInstance> dataSetList) {		
+		
+		File fileObj 								= new File(filePath);
+		//Reading File Contents & Creating Java Representation Objects for DataSet For Classifier Classes//
+		try (FileReader fileReader = new FileReader(fileObj);
+				BufferedReader bufferedReader		= new BufferedReader(fileReader);){
+			String line 							= bufferedReader.readLine();
+			
+			while (line != null) {
+				String[] lineParts 					= line.split("  ");
+				if (lineParts.length < 5) {
+					break;
+				}				
+
+				List<String> lineList 				= Arrays.asList(lineParts);
+				String featureLabel 				= lineList.get(lineList.size() - 1);
+				List<String> featuresList 			= lineList.subList(0, 4);
+				LabelledDataInstance dataInstance 	= new LabelledDataInstance(featuresList, featureLabel);
+				dataSetClasses.add(featureLabel);
+				dataInstance.parseInformationToValues(); // Converts Strings to Floats
+				dataSetList.add(dataInstance);
+				line 								= bufferedReader.readLine();
+			}			
+		} catch (IOException e) {
+			System.out.println("FILE NOT FOUND !!");
+		}
+		
+		String report								= toString();
+		return report;
+	}
 	
 
 }

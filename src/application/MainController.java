@@ -49,28 +49,50 @@ public class MainController {
 	@FXML Group ImagePrevGRP;
 	@FXML Group FeaturePrevGRP;
 	@FXML Group AllInputsPreviewGRP;
-	@FXML TextField PixelCountTF;
-	@FXML TextField FeaturesCountTF;
+	@FXML TextField HiddenLayersCountTF;
+	@FXML TextField NeurounsCountPerHlayerTF;
 	@FXML TextArea InputsVectorTA;
 	@FXML TextArea WeightsVectorTA;
 	@FXML ScrollPane AllInputsPreviewPN;
 	@FXML TextField EpochsTF;
 	@FXML TextField LearningRateTF;
 	@FXML VBox LearningCurveBox;
-	@FXML TextField RandomTF;
+	@FXML TextField MomentumTF;
 	@FXML VBox SnapShotPreviewVB;
 	private Main main;
-	private DataSetsLoader myDataLoader = new DataSetsLoader();
+	public DataSetsLoader myDataLoader = new DataSetsLoader();
 	private int totalEpochsCount				= 0;
 	private LinkedHashMap<Integer, Double> learningcurve=new LinkedHashMap<>();
-	private Processor myModel			= new Processor();
+	private Processor myModel;			
 	public void setMain(Main main) {
 		this.main = main;
 
 //        loadDataSet();
-        myModel.buildNNTest();
+		myModel							= new Processor(this);
+		myDataLoader.loadIrisDataSet(System.getProperty("user.dir").replace('\\', '/') + "/iris-training.txt",myDataLoader.trainingDataSetList);
+		myDataLoader.writeIrisDataSetForNN();
+        myModel.buildNNTest();        
+        
+	}
+	public void buildNNFromUiAttrs() {
+		myModel.buildNNTest2(Integer.parseInt(HiddenLayersCountTF.getText()),Integer.parseInt(NeurounsCountPerHlayerTF.getText()));
+	}
+	public double getLearningRate() {
+		return Double.parseDouble(LearningRateTF.getText());
 	}
 	
+	public double getMomentum() {
+		return Double.parseDouble(MomentumTF.getText());
+	}
+	public int getEpochs() {
+		return Integer.parseInt(EpochsTF.getText());
+	}
+	public void runNN() {
+		myModel.run();
+	}
+	public void appendToStatusText(String message) {
+		StatusTA.setText(message+"\n");
+	}
 	public void loadDataSet() {
 		// Loads Images From Disk 
 		totalEpochsCount			= 0;
