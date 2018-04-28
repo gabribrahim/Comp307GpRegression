@@ -36,7 +36,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import model.DataSetsLoader;
-import model.Processor;
+
 
 
 public class MainController {
@@ -59,27 +59,18 @@ public class MainController {
 	public DataSetsLoader myDataLoader = new DataSetsLoader();
 	private int totalEpochsCount				= 0;
 	public LinkedHashMap<Integer, Double> learningcurve=new LinkedHashMap<>();
-	private Processor myModel;			
+		
 	
 	public void setMain(Main main) {
 		this.main = main;
 
 //        loadDataSet();
-		myModel							= new Processor(this);
+		
 		setupLearningCurveChart();
 		LearningCurveBox.getChildren().add(lineChart);
 		LearningCurveBox.setVgrow(lineChart, Priority.ALWAYS);
-		myDataLoader.loadIrisDataSet(System.getProperty("user.dir").replace('\\', '/') + "/iris-training.txt",myDataLoader.trainingDataSetList);
-		myDataLoader.writeIrisDataSetForNN();
-        myModel.buildNNTest();        
+     
         
-	}
-	public void buildNNFromUiAttrs() {
-		myModel.epochsCounter=0;
-		learningcurve.clear();
-		myModel.buildNNTest2(Integer.parseInt(HiddenLayersCountTF.getText()),Integer.parseInt(NeurounsCountPerHlayerTF.getText()));
-		appendToStatusText("Biult New NN\n HiddenLayers="+HiddenLayersCountTF.getText()
-		+"\nNeuronsPerHiddenLayer="+NeurounsCountPerHlayerTF.getText());
 	}
 	
 	public void resampleLearningCurve() {
@@ -96,9 +87,12 @@ public class MainController {
 		
 	}	
 	public void drawLearningCurveUI(){
-		drawLearningCurve(0.0);
+		drawLearningCurve(0.01);
 	}	
 	
+	public void updateLearningCurveChart(String Message) {
+		StatusLB.setText(Message);
+	}
 	public void drawLearningCurve(double fractionOfPointsToKeep) {
 		lineChart.getData().clear();
 		Map.Entry<Integer,Double> firstEntry					= (Map.Entry<Integer,Double>) learningcurve.entrySet().toArray()[0];		
@@ -127,26 +121,16 @@ public class MainController {
         lineChart.setCreateSymbols(false);
         lineChart.setAnimated(false);
         lineChart.getXAxis().setAutoRanging(true);
+        lineChart.getXAxis();
 		lineChart.getYAxis().setAutoRanging(true);
 		lineChart.setVerticalGridLinesVisible(true);   
 		
 
 	}
 	
-	public double getLearningRate() {
-		return Double.parseDouble(LearningRateTF.getText());
-	}
-	
-	public double getMomentum() {
-		return Double.parseDouble(MomentumTF.getText());
-	}
-	public int getEpochs() {
-		return Integer.parseInt(EpochsTF.getText());
-	}
-	public void runNN() {
-		myModel.run();
+
 		
-	}
+	
 	public void appendToStatusText(String message) {
 		StatusTA.setText(message+"\n");
 	}
@@ -176,10 +160,10 @@ public class MainController {
 
 		return selected;
 	}
-	
+
 	public void saveAsPng(String fileName) {
 		double scale							= 5;
-		Bounds bounds 							= SnapShotPreviewVB.getLayoutBounds();
+		Bounds bounds 							= LearningCurveBox.getLayoutBounds();
 		WritableImage image 					= new WritableImage(
 	            (int) Math.round(bounds.getWidth() * scale),
 	            (int) Math.round(bounds.getHeight() * scale));
@@ -190,7 +174,7 @@ public class MainController {
 		
 //	    WritableImage image2 					= TreeP.snapshot(snapshotParams,null);
     	
-	    ImageView view 							= new ImageView(SnapShotPreviewVB.snapshot(snapshotParams, image));
+	    ImageView view 							= new ImageView(LearningCurveBox.snapshot(snapshotParams, image));
 	    File file = new File(fileName+".png");
 	    
 	    try {
@@ -200,7 +184,7 @@ public class MainController {
 	    }
 	}	
 	public void saveSnapShot() {
-		saveAsPng("LR_" + LearningRateTF.getText()+"_TotalEpochs_"+totalEpochsCount);
+		saveAsPng("LR_" + LearningRateTF.getText()+"_EPC_");
 	}
 		
 }
