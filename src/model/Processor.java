@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.jgap.InvalidConfigurationException;
 import org.jgap.gp.CommandGene;
@@ -18,22 +19,25 @@ import org.jgap.gp.impl.GPGenotype;
 import org.jgap.gp.terminal.Terminal;
 import org.jgap.gp.terminal.Variable;
 
+import application.MainController;
+
 public class Processor  extends GPProblem {
     @SuppressWarnings("boxing")
-    private static double[] INPUT_1 = { 26.0d, 8.0d, 20.0d, 33.0d, 37.0d };
+    public static ArrayList<Double> INPUT_1 = new ArrayList<>(Arrays.asList(26.0d, 8.0d, 20.0d, 33.0d, 37.0d));
 
     @SuppressWarnings("boxing")
-    private static double[] INPUT_2 = { 35.0d, 24.0d, 1.0d, 11.0d, 16.0d };
+    public static  ArrayList<Double>INPUT_2 = new ArrayList<>(Arrays.asList( 35.0d, 24.0d, 1.0d, 11.0d, 16.0d));
 
-    private static double[] OUTPUT = { 829.0d, 141.0d, 467.0d, 1215.0d, 1517.0d };
-
+    public static  ArrayList<Double> OUTPUT = new ArrayList<>(Arrays.asList( 829.0d, 141.0d, 467.0d, 1215.0d, 1517.0d));
+    public GPConfiguration config = getGPConfiguration();
     private Variable _xVariable;
     private Variable _yVariable;
+    public MainController uiWin	;
 
     public Processor() throws InvalidConfigurationException {
         super(new GPConfiguration());
 
-        GPConfiguration config = getGPConfiguration();
+        
 
         _xVariable = Variable.create(config, "X", CommandGene.DoubleClass);
         _yVariable = Variable.create(config, "Y", CommandGene.DoubleClass);
@@ -50,27 +54,6 @@ public class Processor  extends GPProblem {
         config.setStrictProgramCreation(true);
     }
 
-
-	public void getInputsFromFile() {
-		String trainingFilePath		= System.getProperty("user.dir").replace('\\', '/') + "/regression.txt";
-		File fileObj 								= new File(trainingFilePath);
-		String line									="";
-		ArrayList<Double> outputs					= new ArrayList<>();
-		ArrayList<Double> inputs 					= new ArrayList<>();
-		try (FileReader fileReader = new FileReader(fileObj);
-				BufferedReader bufferedReader		= new BufferedReader(fileReader);){
-				line								= bufferedReader.readLine();
-				while (line!=null) {				
-					String[] lineParts				= line.split(";");
-					outputs.add(Double.parseDouble(lineParts[1]));
-					inputs.add(Double.parseDouble(lineParts[0]));
-				 	line							= bufferedReader.readLine();
-				}
-		
-		} catch (IOException e) {
-			System.out.println("FILE NOT FOUND !!");
-		}		
-	}
     @Override
     public GPGenotype create() throws InvalidConfigurationException {
         GPConfiguration config = getGPConfiguration();
@@ -99,6 +82,29 @@ public class Processor  extends GPProblem {
         return result;
     }
 
+	public void getInputsFromFile() {
+		String trainingFilePath		= System.getProperty("user.dir").replace('\\', '/') + "/regression.txt";
+		File fileObj 								= new File(trainingFilePath);
+		String line									="";
+		ArrayList<Double> outputs					= new ArrayList<>();
+		ArrayList<Double> inputs 					= new ArrayList<>();
+		try (FileReader fileReader = new FileReader(fileObj);
+				BufferedReader bufferedReader		= new BufferedReader(fileReader);){
+				line								= bufferedReader.readLine();
+				while (line!=null) {				
+					String[] lineParts				= line.split(";");
+					outputs.add(Double.parseDouble(lineParts[1]));
+					inputs.add(Double.parseDouble(lineParts[0]));
+				 	line							= bufferedReader.readLine();
+				}
+		
+		} catch (IOException e) {
+			System.out.println("FILE NOT FOUND !!");
+		}		
+		INPUT_1										= inputs;
+		OUTPUT										= outputs;
+		uiWin.appendToStatusText("Inputs= " + INPUT_1+"\nOutput= "+OUTPUT);
+	}
     public static void main(String[] args) throws Exception {
         GPProblem problem = new Processor();
 
@@ -115,9 +121,13 @@ public class Processor  extends GPProblem {
 //        gp.outputSolution(gp.getAllTimeBest());
         IGPProgram bestP 	= gp.getAllTimeBest();
         
-        problem.getGPConfiguration().getVariable("X").set(26.0);
-        problem.getGPConfiguration().getVariable("Y").set(35.0);
-        System.out.println(bestP.size()+"\nExecuted INT="+bestP.execute_double(0,new Object[0]));
+        problem.getGPConfiguration().getVariable("X").set(20.0);
+        problem.getGPConfiguration().getVariable("Y").set(1.0);
+        System.out.println(bestP.getChromosome(0).getGene(0)+""+
+        		bestP.getChromosome(0).getGene(1)+""+
+        		bestP.getChromosome(0).getGene(2)+""+
+        		bestP.getChromosome(0).getGene(3)+""+
+        		"\nExecuted INT="+bestP.execute_double(0,new Object[0]));
     }
 
 }

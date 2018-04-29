@@ -11,6 +11,9 @@ import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
+import org.jgap.InvalidConfigurationException;
+import org.jgap.gp.GPProblem;
+
 import javafx.embed.swing.SwingFXUtils;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
@@ -36,6 +39,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import model.DataSetsLoader;
+import model.Processor;
 
 
 
@@ -56,6 +60,7 @@ public class MainController {
     private NumberAxis xAxis 					= new NumberAxis();
     private NumberAxis yAxis 					= new NumberAxis();
     private LineChart<Number,Number> lineChart  = new LineChart<Number,Number>(xAxis,yAxis);	
+    private Processor myModel ;
 	public DataSetsLoader myDataLoader = new DataSetsLoader();
 	private int totalEpochsCount				= 0;
 	public LinkedHashMap<Integer, Double> learningcurve=new LinkedHashMap<>();
@@ -63,12 +68,19 @@ public class MainController {
 	
 	public void setMain(Main main) {
 		this.main = main;
-
+		try {
+			myModel									= new Processor();	
+			myModel.uiWin							= this;
+		} catch (InvalidConfigurationException e) {			
+			e.printStackTrace();
+		}
 //        loadDataSet();
-		
+		myModel.getInputsFromFile();
 		setupLearningCurveChart();
 		LearningCurveBox.getChildren().add(lineChart);
 		LearningCurveBox.setVgrow(lineChart, Priority.ALWAYS);
+		drawDataSet();
+		
      
         
 	}
@@ -82,46 +94,34 @@ public class MainController {
 		// Traditional way to get the response value.
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()){
-			drawLearningCurve(Double.parseDouble(result.get()));
+			
 		}		
 		
 	}	
-	public void drawLearningCurveUI(){
-		drawLearningCurve(0.01);
-	}	
+
 	
 	public void updateLearningCurveChart(String Message) {
 		StatusLB.setText(Message);
 	}
-	public void drawLearningCurve(double fractionOfPointsToKeep) {
+	public void drawDataSet() {
 		lineChart.getData().clear();
-		Map.Entry<Integer,Double> firstEntry					= (Map.Entry<Integer,Double>) learningcurve.entrySet().toArray()[0];		
-		XYChart.Series<Number,Number> series 	= new XYChart.Series<>();
-		series.getData().add(new XYChart.Data(firstEntry.getKey(), firstEntry.getValue()));
-		double pointsToSkip						= learningcurve.size()*fractionOfPointsToKeep;
-		Iterator iter							=learningcurve.entrySet().iterator();
-		while(iter.hasNext()) {
-			Map.Entry<Integer,Double> point		= (Map.Entry)iter.next();
-			series.getData().add(new XYChart.Data(point.getKey(), point.getValue()));
-			for(int i=0; i<(int)pointsToSkip;i++) {
-				if(iter.hasNext()) {iter.next();}
-			}
-		}
 		
-		Map.Entry<Integer,Double> lastEntry					= (Map.Entry<Integer,Double>) learningcurve.entrySet().toArray()[0];		
-		series.getData().add(new XYChart.Data(lastEntry.getKey(), lastEntry.getValue()));
-
+		XYChart.Series<Number,Number> series 	= new XYChart.Series<>();
+		series.setName("Input Data Set");
+		for(int i=0; i<myModel.INPUT_1.size();i++) {			
+			series.getData().add(new XYChart.Data(myModel.INPUT_1.get(i), myModel.OUTPUT.get(i)));
+		}
 		lineChart.getData().add(series);
 		
 	}	
+	
 	public void setupLearningCurveChart() {
-        xAxis.setLabel("Epoch");
-        yAxis.setLabel("Error");        
+        xAxis.setLabel("X");
+        yAxis.setLabel("Y");        
 //        lineChart.setTitle("Learning Curve");
         lineChart.setCreateSymbols(false);
         lineChart.setAnimated(false);
-        lineChart.getXAxis().setAutoRanging(true);
-        lineChart.getXAxis();
+        lineChart.getXAxis().setAutoRanging(true);        
 		lineChart.getYAxis().setAutoRanging(true);
 		lineChart.setVerticalGridLinesVisible(true);   
 		
