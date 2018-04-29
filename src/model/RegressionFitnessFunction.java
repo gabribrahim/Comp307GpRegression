@@ -8,20 +8,16 @@ import org.jgap.gp.terminal.Variable;
 
 public class RegressionFitnessFunction extends GPFitnessFunction {
 
-    private ArrayList<Double> _input1;
-    private ArrayList<Double> _input2;
+    private ArrayList<Double> _input1;    
     private ArrayList<Double> _output;
-    private Variable _xVariable;
-    private Variable _yVariable;
+    private Variable _xVariable;    
 
     private static Object[] NO_ARGS = new Object[0];
 
-    public RegressionFitnessFunction(ArrayList<Double> input1, ArrayList<Double> input2,ArrayList<Double> output, Variable x, Variable y) {
-        _input1 = input1;
-        _input2 = input2;
+    public RegressionFitnessFunction(ArrayList<Double> input1, ArrayList<Double> output, Variable x) {
+        _input1 = input1;        
         _output = output;
-        _xVariable = x;
-        _yVariable = y;
+        _xVariable = x;        
     }
     
    
@@ -32,8 +28,7 @@ public class RegressionFitnessFunction extends GPFitnessFunction {
         double longResult = 0;
         for (int i = 0; i < _input1.size(); i++) {
             // Set the input values
-            _xVariable.set(_input1.get(i));
-            _yVariable.set(_input2.get(i));
+            _xVariable.set(_input1.get(i));            
             // Execute the genetically engineered algorithm
             double value =  program.execute_double(0, NO_ARGS);
 

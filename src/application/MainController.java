@@ -2,6 +2,7 @@ package application;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -84,6 +85,23 @@ public class MainController {
      
         
 	}
+	public void evoloveForEpochs() {
+		int epochs					= Integer.parseInt(EpochsTF.getText());
+		myModel.evolveForNEpochs(epochs);
+
+	}
+	public void initPopulation() {
+		try {
+			myModel						= new Processor();
+			myModel.uiWin				= this;
+		} catch (InvalidConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		myModel.getInputsFromFile();
+		myModel.initialisePopulation();
+		drawDataSet();
+	}
 	
 	public void resampleLearningCurve() {
 		TextInputDialog dialog = new TextInputDialog("0.01");
@@ -114,6 +132,21 @@ public class MainController {
 		lineChart.getData().add(series);
 		
 	}	
+
+	public void drawPredictedSet() {
+//		lineChart.getData().clear();
+		
+		XYChart.Series<Number,Number> series 	= new XYChart.Series<>();
+		series.setName("Predicted Data Set");
+		ArrayList<Double> predictedOutput		= myModel.generateCheckPoints();
+		for(int i=0; i<myModel.INPUT_1.size();i++) {			
+			series.getData().add(new XYChart.Data(myModel.INPUT_1.get(i), predictedOutput.get(i)));
+		}
+		lineChart.getData().add(series);
+		
+	}	
+	
+	
 	
 	public void setupLearningCurveChart() {
         xAxis.setLabel("X");

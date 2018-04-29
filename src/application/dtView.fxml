@@ -26,9 +26,9 @@
                <children>
                   <VBox prefHeight="457.0" prefWidth="259.0">
                      <children>
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="755.0" text="Build Network" />
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefHeight="39.0" prefWidth="755.0" text="Train Network" />
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="755.0" text="TestSet Error Measure" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#initPopulation" prefWidth="755.0" text="Init Population" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#evoloveForEpochs" prefHeight="39.0" prefWidth="755.0" text="Evolve for N Epochs" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="755.0" text="GetFittestIndividual" />
                         <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="755.0" text="Save SnapShot" />
                         <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="457.0" prefWidth="755.0" wrapText="true" VBox.vgrow="ALWAYS" />
                      </children>
@@ -44,25 +44,31 @@
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="39.0" prefWidth="1024.0">
                      <children>
-                        <Label prefHeight="38.0" text="Learning Rate:.">
-                           <padding>
-                              <Insets left="10.0" right="10.0" />
-                           </padding>
-                        </Label>
-                        <TextField id="KnnTF" fx:id="LearningRateTF" maxWidth="62.0" text="0.1" />
-                        <Label text="Momentum:." />
-                        <TextField fx:id="MomentumTF" prefWidth="62.0" text="0.5" />
                         <Label text="Epochs :." />
-                        <TextField fx:id="EpochsTF" maxWidth="62.0" text="1000" />
+                        <TextField fx:id="EpochsTF" maxWidth="62.0" text="1" />
+                        <Label text="Max#Nodes" />
+                        <TextField fx:id="MomentumTF111" prefWidth="62.0" text="15" />
+                        <Label text="MaxDepth" />
+                        <TextField fx:id="MomentumTF" prefWidth="62.0" text="0.5" />
+                        <Label text="MinDepth" />
+                        <TextField fx:id="MomentumTF1" prefWidth="62.0" text="0.5" />
+                        <Label text="Population Size" />
+                        <TextField fx:id="MomentumTF11" prefWidth="62.0" text="0.5" />
                      </children>
                   </HBox>
                   <Separator prefWidth="200.0" />
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label text="Hidden Layers:." />
+                        <Label text="CrossOverRate" />
                         <TextField fx:id="HiddenLayersCountTF" maxWidth="62.0" text="4" />
-                        <Label text="Nodes Per Hidden Layer" />
+                        <Label text="Mutation Rate" />
                         <TextField fx:id="NeurounsCountPerHlayerTF" maxWidth="62.0" text="5" />
+                        <Label prefHeight="38.0" text="ReproductionRate:.">
+                           <padding>
+                              <Insets left="10.0" right="10.0" />
+                           </padding>
+                        </Label>
+                        <TextField id="KnnTF" fx:id="LearningRateTF" maxWidth="62.0" text="0.1" />
                      </children>
                   </HBox>
                </children>
