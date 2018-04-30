@@ -50,12 +50,16 @@ public class MainController {
 	@FXML Label MainLabel;		
 	@FXML Label StatusLB;
 	@FXML HBox PreviewHB;
-	@FXML TextField HiddenLayersCountTF;
-	@FXML TextField NeurounsCountPerHlayerTF;
+	@FXML TextField MinDepthTF;
+	@FXML TextField MaxDepthTF;
 	@FXML TextField EpochsTF;
-	@FXML TextField LearningRateTF;
+	@FXML TextField MaxNodesTF;
 	@FXML VBox LearningCurveBox;
-	@FXML TextField MomentumTF;
+	@FXML TextField PopSizeTF;
+	@FXML TextField CrossOverTF;
+	@FXML TextField ReproduceTF;
+	@FXML TextField MutateTF;
+	@FXML TextField NewChromTF;
 	@FXML VBox SnapShotPreviewVB;
 	private Main main;
     private NumberAxis xAxis 					= new NumberAxis();
@@ -85,15 +89,30 @@ public class MainController {
      
         
 	}
+	public int getMaxNodes() {
+		int maxNodes				= Integer.parseInt(MaxNodesTF.getText());
+		return maxNodes;
+	}
 	public void evoloveForEpochs() {
 		int epochs					= Integer.parseInt(EpochsTF.getText());
+		
 		myModel.evolveForNEpochs(epochs);
+		StatusLB.setText("Ephoch :"+myModel.epochCounter);
+		appendToStatusText(myModel.outputSolution(myModel.gp.getAllTimeBest()));
 
 	}
 	public void initPopulation() {
 		try {
 			myModel						= new Processor();
-			myModel.uiWin				= this;
+			myModel.uiWin				= this;			
+			myModel.config.setMinInitDepth(Integer.parseInt(MinDepthTF.getText()));
+			myModel.config.setMaxInitDepth(Integer.parseInt(MaxDepthTF.getText()));
+			myModel.config.setPopulationSize(Integer.parseInt(PopSizeTF.getText()));
+			myModel.config.setMaxCrossoverDepth(Integer.parseInt(MaxDepthTF.getText()));
+			myModel.config.setMutationProb(Float.parseFloat(CrossOverTF.getText()));
+			myModel.config.setCrossoverProb(Float.parseFloat(MutateTF.getText()));	
+			myModel.config.setReproductionProb(Float.parseFloat(ReproduceTF.getText()));
+			myModel.config.setNewChromsPercent(Float.parseFloat(NewChromTF.getText()));			
 		} catch (InvalidConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -217,7 +236,7 @@ public class MainController {
 	    }
 	}	
 	public void saveSnapShot() {
-		saveAsPng("LR_" + LearningRateTF.getText()+"_EPC_");
+		saveAsPng("LR_" + EpochsTF.getText()+"_EPC_");
 	}
 		
 }

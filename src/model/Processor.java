@@ -9,6 +9,9 @@ import java.util.Arrays;
 
 import org.jgap.Configuration;
 import org.jgap.InvalidConfigurationException;
+import org.jgap.event.EventManager;
+import org.jgap.event.GeneticEvent;
+import org.jgap.event.GeneticEventListener;
 import org.jgap.gp.CommandGene;
 import org.jgap.gp.GPProblem;
 import org.jgap.gp.IGPProgram;
@@ -17,15 +20,19 @@ import org.jgap.gp.function.Add;
 import org.jgap.gp.function.Divide;
 import org.jgap.gp.function.Log;
 import org.jgap.gp.function.Multiply;
+import org.jgap.gp.function.Pow;
 import org.jgap.gp.function.Subtract;
+import org.jgap.gp.function.Switch;
 import org.jgap.gp.impl.DeltaGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.impl.GPGenotype;
 import org.jgap.gp.terminal.Constant;
 import org.jgap.gp.terminal.Terminal;
 import org.jgap.gp.terminal.Variable;
+import org.jgap.util.NumberKit;
 
 import application.MainController;
+import javafx.application.Platform;
 
 public class Processor  extends GPProblem {
     @SuppressWarnings("boxing")
@@ -38,10 +45,10 @@ public class Processor  extends GPProblem {
     public GPConfiguration config = getGPConfiguration();
     private Variable _xVariable;
     private Variable _yVariable;
-    private GPGenotype gp;
+    public GPGenotype gp;
     public MainController uiWin	;
     public int epochCounter;
-
+    public EventManager eventManager  		= new EventManager();
     public Processor() throws InvalidConfigurationException {
         super(new GPConfiguration());
         Configuration.reset();
@@ -51,12 +58,15 @@ public class Processor  extends GPProblem {
         
 
         config.setGPFitnessEvaluator(new DeltaGPFitnessEvaluator());
-        config.setMinInitDepth(5);
-        config.setMaxInitDepth(7);
+        config.setMinInitDepth(2);
+        config.setMaxInitDepth(6);
         config.setPopulationSize(1000);
-        config.setMaxCrossoverDepth(7);
-        config.setMutationProb((float) 0.3);
+        config.setMaxCrossoverDepth(6);
+        config.setEventManager(eventManager);
+        config.setMutationProb((float) 0.1);
         config.setCrossoverProb((float)0.9);
+        config.setReproductionProb((float)0.1);
+        config.setNewChromsPercent((float)0.3);
         config.setPreservFittestIndividual(true);
         config.setKeepPopulationSizeConstant(true);
 //        config.setProgramCreationMaxTries(-1);
@@ -64,6 +74,35 @@ public class Processor  extends GPProblem {
         config.setStrictProgramCreation(true);
     }
 
+    public String outputSolution(IGPProgram a_best) {
+    	String bestIndividualRep			= "";
+        if (a_best == null) {
+        	bestIndividualRep				= "No best solution (null)";
+          return bestIndividualRep;
+        }
+        double bestValue = a_best.getFitnessValue();
+        if (Double.isInfinite(bestValue)) {
+        	bestIndividualRep				= "No best solution (infinite)";
+          return bestIndividualRep;
+        }
+        bestIndividualRep					+="Best solution fitness: " +NumberKit.niceDecimalNumber(bestValue, 2)+"\n";
+        bestIndividualRep					+="Best solution: " + a_best.toStringNorm(0)+"\n";
+        String depths = "";
+        int size = a_best.size();
+        for (int i = 0; i < size; i++) {
+          if (i > 0) {
+            depths += " / ";
+          }
+          depths += a_best.getChromosome(i).getDepth(0);
+        }
+        if (size == 1) {
+        	bestIndividualRep				+= "Depth of chrom: " + depths;
+        }
+        else {
+        	bestIndividualRep				+= "Depths of chroms: " + depths;
+        }
+        return bestIndividualRep;
+      }
     @Override
     public GPGenotype create() throws InvalidConfigurationException {
 //        GPConfiguration config = getGPConfiguration();
@@ -84,16 +123,36 @@ public class Processor  extends GPProblem {
 //                new Abs(config,CommandGene.DoubleClass),
                 new Divide(config,CommandGene.DoubleClass),
                 new Subtract(config,CommandGene.DoubleClass),
-                new Log(config,CommandGene.DoubleClass),
+//                new Log(config,CommandGene.DoubleClass),
+                new Pow(config,CommandGene.DoubleClass),
+                new Switch(config,CommandGene.DoubleClass),
                 new Constant(config, CommandGene.DoubleClass,1.0),
+                new Constant(config, CommandGene.DoubleClass,2.0),
                 new Terminal(config, CommandGene.DoubleClass, 0.0, 50, true),
                 new Terminal(config, CommandGene.DoubleClass, 0.0, 50, false)
             }
         };
+        GPGenotype result ;
+        if (uiWin !=null) {
+        		result 			= GPGenotype.randomInitialGenotype(config, types, argTypes,
+                					nodeSets, uiWin.getMaxNodes(), true);
+        		System.out.println("Adding EventLister");
+        		config.getEventManager().addEventListener(GeneticEvent.
+        				GENOTYPE_EVOLVED_EVENT, new GeneticEventListener() {
 
-        GPGenotype result = GPGenotype.randomInitialGenotype(config, types, argTypes,
-                nodeSets, 15, true);
-
+							@Override
+							public void geneticEventFired(GeneticEvent a_firedEvent) {
+								System.out.println("AAAAAAAAAAAAAAAAAAAA");
+						    	Platform.runLater(()->uiWin.drawDataSet());
+						    	Platform.runLater(()->uiWin.drawPredictedSet()); 								
+							}
+        			
+        		});
+        }else {
+            	result 			= GPGenotype.randomInitialGenotype(config, types, argTypes,
+                    			nodeSets, 15, true);
+        	
+        }
         return result;
     }
     

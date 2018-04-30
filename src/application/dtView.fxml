@@ -40,38 +40,47 @@
                   </VBox>
                </children>
             </HBox>
-            <VBox prefHeight="100.0" prefWidth="1004.0" spacing="7.0">
+            <VBox prefHeight="91.0" prefWidth="1004.0" spacing="7.0">
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="39.0" prefWidth="1024.0">
                      <children>
                         <Label text="Epochs :." />
                         <TextField fx:id="EpochsTF" maxWidth="62.0" text="1" />
                         <Label text="Max#Nodes" />
-                        <TextField fx:id="MomentumTF111" prefWidth="62.0" text="15" />
+                        <TextField fx:id="MaxNodesTF" prefWidth="62.0" text="15" />
                         <Label text="MaxDepth" />
-                        <TextField fx:id="MomentumTF" prefWidth="62.0" text="0.5" />
+                        <TextField fx:id="MaxDepthTF" prefWidth="62.0" text="6" />
                         <Label text="MinDepth" />
-                        <TextField fx:id="MomentumTF1" prefWidth="62.0" text="0.5" />
+                        <TextField fx:id="MinDepthTF" prefWidth="62.0" text="2" />
                         <Label text="Population Size" />
-                        <TextField fx:id="MomentumTF11" prefWidth="62.0" text="0.5" />
+                        <TextField fx:id="PopSizeTF" prefWidth="62.0" text="1000" />
                      </children>
                   </HBox>
                   <Separator prefWidth="200.0" />
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Label text="CrossOverRate" />
-                        <TextField fx:id="HiddenLayersCountTF" maxWidth="62.0" text="4" />
+                        <TextField fx:id="CrossOverTF" maxWidth="62.0" text="0.9" />
                         <Label text="Mutation Rate" />
-                        <TextField fx:id="NeurounsCountPerHlayerTF" maxWidth="62.0" text="5" />
-                        <Label prefHeight="38.0" text="ReproductionRate:.">
+                        <TextField fx:id="MutateTF" maxWidth="62.0" text="0.1" />
+                        <Label text="ReproductionRate:.">
                            <padding>
                               <Insets left="10.0" right="10.0" />
                            </padding>
                         </Label>
-                        <TextField id="KnnTF" fx:id="LearningRateTF" maxWidth="62.0" text="0.1" />
+                        <TextField id="KnnTF" fx:id="ReproduceTF" maxWidth="62.0" text="0.1" />
+                        <Label text="NewChrom%:">
+                           <padding>
+                              <Insets left="10.0" right="10.0" />
+                           </padding>
+                        </Label>
+                        <TextField id="KnnTF" fx:id="NewChromTF" maxWidth="62.0" text="0.3" />
                      </children>
                   </HBox>
                </children>
+               <padding>
+                  <Insets top="2.0" />
+               </padding>
             </VBox>
          </children>
       </VBox>
