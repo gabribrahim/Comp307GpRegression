@@ -215,7 +215,7 @@ public class MainController {
 
 	public void saveAsPng(String fileName) {
 		double scale							= 5;
-		Bounds bounds 							= LearningCurveBox.getLayoutBounds();
+		Bounds bounds 							= SnapShotPreviewVB.getLayoutBounds();
 		WritableImage image 					= new WritableImage(
 	            (int) Math.round(bounds.getWidth() * scale),
 	            (int) Math.round(bounds.getHeight() * scale));
@@ -226,7 +226,7 @@ public class MainController {
 		
 //	    WritableImage image2 					= TreeP.snapshot(snapshotParams,null);
     	
-	    ImageView view 							= new ImageView(LearningCurveBox.snapshot(snapshotParams, image));
+	    ImageView view 							= new ImageView(SnapShotPreviewVB.snapshot(snapshotParams, image));
 	    File file = new File(fileName+".png");
 	    
 	    try {

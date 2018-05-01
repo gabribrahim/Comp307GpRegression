@@ -29,13 +29,31 @@
                         <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#initPopulation" prefWidth="755.0" text="Init Population" />
                         <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#evoloveForEpochs" prefHeight="39.0" prefWidth="755.0" text="Evolve for N Epochs" />
                         <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="755.0" text="GetFittestIndividual" />
-                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="755.0" text="Save SnapShot" />
+                        <Button alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#saveSnapShot" prefWidth="755.0" text="Save SnapShot" />
                         <TextArea fx:id="StatusTA" maxWidth="-Infinity" prefHeight="457.0" prefWidth="755.0" wrapText="true" VBox.vgrow="ALWAYS" />
                      </children>
                   </VBox>
                   <VBox fx:id="LearningCurveBox" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label fx:id="StatusLB" prefHeight="27.0" prefWidth="688.0" text="Label" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="504.0" prefWidth="178.0">
+                     <children>
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Add" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Multiply" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Divide" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Subtract" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Pow" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Log" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="IF" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="GreaterThan" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="LessThan" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Equals" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Constant 1" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Constant 2" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Random Int" />
+                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Random Double" />
                      </children>
                   </VBox>
                </children>

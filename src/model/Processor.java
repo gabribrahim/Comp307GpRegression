@@ -18,6 +18,9 @@ import org.jgap.gp.IGPProgram;
 import org.jgap.gp.function.Abs;
 import org.jgap.gp.function.Add;
 import org.jgap.gp.function.Divide;
+import org.jgap.gp.function.Equals;
+import org.jgap.gp.function.GreaterThan;
+import org.jgap.gp.function.LesserThan;
 import org.jgap.gp.function.Log;
 import org.jgap.gp.function.Multiply;
 import org.jgap.gp.function.Pow;
@@ -62,7 +65,7 @@ public class Processor  extends GPProblem {
         config.setMaxInitDepth(6);
         config.setPopulationSize(1000);
         config.setMaxCrossoverDepth(6);
-        config.setEventManager(eventManager);
+//        config.setEventManager(eventManager);
         config.setMutationProb((float) 0.1);
         config.setCrossoverProb((float)0.9);
         config.setReproductionProb((float)0.1);
@@ -120,12 +123,15 @@ public class Processor  extends GPProblem {
                 _xVariable,                
                 new Add(config, CommandGene.DoubleClass),
                 new Multiply(config, CommandGene.DoubleClass),
-//                new Abs(config,CommandGene.DoubleClass),
+                new Abs(config,CommandGene.DoubleClass),
                 new Divide(config,CommandGene.DoubleClass),
                 new Subtract(config,CommandGene.DoubleClass),
-//                new Log(config,CommandGene.DoubleClass),
+                new Log(config,CommandGene.DoubleClass),
                 new Pow(config,CommandGene.DoubleClass),
                 new Switch(config,CommandGene.DoubleClass),
+                new GreaterThan(config,CommandGene.DoubleClass),
+                new LesserThan(config,CommandGene.DoubleClass),
+                new Equals(config,CommandGene.DoubleClass),
                 new Constant(config, CommandGene.DoubleClass,1.0),
                 new Constant(config, CommandGene.DoubleClass,2.0),
                 new Terminal(config, CommandGene.DoubleClass, 0.0, 50, true),
