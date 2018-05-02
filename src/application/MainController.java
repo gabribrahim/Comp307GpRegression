@@ -13,7 +13,23 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 
 import org.jgap.InvalidConfigurationException;
+import org.jgap.gp.CommandGene;
 import org.jgap.gp.GPProblem;
+import org.jgap.gp.function.Abs;
+import org.jgap.gp.function.Add;
+import org.jgap.gp.function.Divide;
+import org.jgap.gp.function.Equals;
+import org.jgap.gp.function.Exp;
+import org.jgap.gp.function.GreaterThan;
+import org.jgap.gp.function.LesserThan;
+import org.jgap.gp.function.Log;
+import org.jgap.gp.function.Multiply;
+import org.jgap.gp.function.Pow;
+import org.jgap.gp.function.Subtract;
+import org.jgap.gp.function.Switch;
+import org.jgap.gp.impl.GPConfiguration;
+import org.jgap.gp.terminal.Constant;
+import org.jgap.gp.terminal.Terminal;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.embed.swing.SwingNode;
@@ -26,6 +42,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -61,6 +78,22 @@ public class MainController {
 	@FXML TextField MutateTF;
 	@FXML TextField NewChromTF;
 	@FXML VBox SnapShotPreviewVB;
+	@FXML CheckBox AddCB;
+	@FXML CheckBox MultiplyCB;
+	@FXML CheckBox PowCB;
+	@FXML CheckBox LogCB;
+	@FXML CheckBox AbsCB;
+	@FXML CheckBox IfCB;
+	@FXML CheckBox ExpCB;
+	@FXML CheckBox GreaterThanCB;
+	@FXML CheckBox LessThanCB;
+	@FXML CheckBox EqualsCB;
+	@FXML CheckBox Constant1CB;
+	@FXML CheckBox Constant2CB;
+	@FXML CheckBox RandomIntCB;
+	@FXML CheckBox RandomDoubleCB;
+	@FXML CheckBox SubtractCB;
+	@FXML CheckBox DivideCB;
 	private Main main;
     private NumberAxis xAxis 					= new NumberAxis();
     private NumberAxis yAxis 					= new NumberAxis();
@@ -213,6 +246,59 @@ public class MainController {
 		return selected;
 	}
 
+    public ArrayList<CommandGene> createTerminalsAndFunctionsFromUI(GPConfiguration config) throws InvalidConfigurationException{
+    	ArrayList<CommandGene> terminalsAndFunctions = new ArrayList<>();
+    	if (AddCB.isSelected()) {
+    		terminalsAndFunctions.add(new Add(config, CommandGene.DoubleClass));
+    	}
+    	if (MultiplyCB.isSelected()) {
+    		terminalsAndFunctions.add(new Multiply(config, CommandGene.DoubleClass));    		
+    	}
+    	if (DivideCB.isSelected()) {
+    		terminalsAndFunctions.add(new Divide(config, CommandGene.DoubleClass));
+    	}
+    	if (SubtractCB.isSelected()) {
+    		terminalsAndFunctions.add(new Subtract(config, CommandGene.DoubleClass));
+    	}    	
+    	if (PowCB.isSelected()) {
+    		terminalsAndFunctions.add(new Pow(config, CommandGene.DoubleClass));
+    	}  
+    	if (ExpCB.isSelected()) {
+    		terminalsAndFunctions.add(new Exp(config, CommandGene.DoubleClass));
+    	}     	
+    	if (LogCB.isSelected()) {
+    		terminalsAndFunctions.add(new Log(config, CommandGene.DoubleClass));
+    	}    	
+    	if (AbsCB.isSelected()) {
+    		terminalsAndFunctions.add(new Abs(config, CommandGene.DoubleClass));
+    	}    	
+    	if (IfCB.isSelected()) {
+    		terminalsAndFunctions.add(new Switch(config, CommandGene.DoubleClass));
+    	}    	
+    	if (GreaterThanCB.isSelected()) {
+    		terminalsAndFunctions.add(new GreaterThan(config, CommandGene.DoubleClass));
+    	}    	
+    	if (LessThanCB.isSelected()) {
+    		terminalsAndFunctions.add(new LesserThan(config, CommandGene.DoubleClass));
+    	}    
+    	if (EqualsCB.isSelected()) {
+    		terminalsAndFunctions.add(new Equals(config, CommandGene.DoubleClass));
+    	}    
+    	if (Constant1CB.isSelected()) {
+    		terminalsAndFunctions.add(new Constant(config, CommandGene.DoubleClass,1.0));
+    	}
+    	if (Constant2CB.isSelected()) {
+    		terminalsAndFunctions.add(new Constant(config, CommandGene.DoubleClass,2.0));
+    	}
+    	if (RandomIntCB.isSelected()) {
+    		terminalsAndFunctions.add(new Terminal(config, CommandGene.DoubleClass, 0.0, 50, true));
+    	}
+    	if (RandomDoubleCB.isSelected()) {
+    		terminalsAndFunctions.add(new Terminal(config, CommandGene.DoubleClass, 0.0, 50, false));
+    	}
+    	return terminalsAndFunctions;
+    }
+    
 	public void saveAsPng(String fileName) {
 		double scale							= 5;
 		Bounds bounds 							= SnapShotPreviewVB.getLayoutBounds();

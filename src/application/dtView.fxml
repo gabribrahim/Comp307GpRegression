@@ -40,20 +40,22 @@
                   </VBox>
                   <VBox prefHeight="504.0" prefWidth="178.0">
                      <children>
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Add" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Multiply" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Divide" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Subtract" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Pow" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Log" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="IF" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="GreaterThan" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="LessThan" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Equals" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Constant 1" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Constant 2" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Random Int" />
-                        <CheckBox contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Random Double" />
+                        <CheckBox fx:id="AddCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Add" />
+                        <CheckBox fx:id="MultiplyCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Multiply" />
+                        <CheckBox fx:id="DivideCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Divide" />
+                        <CheckBox fx:id="SubtractCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Subtract" />
+                        <CheckBox fx:id="PowCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Pow" />
+                        <CheckBox fx:id="ExpCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Exp" />
+                        <CheckBox fx:id="LogCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Log" />
+                        <CheckBox fx:id="AbsCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Abs" />
+                        <CheckBox fx:id="IfCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="If" />
+                        <CheckBox fx:id="GreaterThanCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="GreaterThan" />
+                        <CheckBox fx:id="LessThanCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="LessThan" />
+                        <CheckBox fx:id="EqualsCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" text="Equals" />
+                        <CheckBox fx:id="Constant1CB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Constant 1" />
+                        <CheckBox fx:id="Constant2CB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Constant 2" />
+                        <CheckBox fx:id="RandomIntCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Random Int" />
+                        <CheckBox fx:id="RandomDoubleCB" contentDisplay="TEXT_ONLY" mnemonicParsing="false" prefHeight="27.0" prefWidth="179.0" selected="true" text="Random Double" />
                      </children>
                   </VBox>
                </children>

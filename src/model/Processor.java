@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.tree.TreeNode;
+
 import org.jgap.Configuration;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.event.EventManager;
@@ -24,11 +26,14 @@ import org.jgap.gp.function.LesserThan;
 import org.jgap.gp.function.Log;
 import org.jgap.gp.function.Multiply;
 import org.jgap.gp.function.Pow;
+import org.jgap.gp.function.SubProgram;
 import org.jgap.gp.function.Subtract;
 import org.jgap.gp.function.Switch;
 import org.jgap.gp.impl.DeltaGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.impl.GPGenotype;
+import org.jgap.gp.impl.JGAPTreeNode;
+import org.jgap.gp.impl.ProgramChromosome;
 import org.jgap.gp.terminal.Constant;
 import org.jgap.gp.terminal.Terminal;
 import org.jgap.gp.terminal.Variable;
@@ -106,6 +111,21 @@ public class Processor  extends GPProblem {
         }
         return bestIndividualRep;
       }
+    
+    
+    public ArrayList<CommandGene> createTerminalsAndFunctionsFromUI(){
+    	ArrayList<CommandGene> terminalsAndFunctions = null;
+		try {
+			terminalsAndFunctions = uiWin.createTerminalsAndFunctionsFromUI(config);
+		} catch (InvalidConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return terminalsAndFunctions;
+    }
+    
+    
     @Override
     public GPGenotype create() throws InvalidConfigurationException {
 //        GPConfiguration config = getGPConfiguration();
@@ -118,30 +138,44 @@ public class Processor  extends GPProblem {
 
         // Next, we define the set of available GP commands and terminals to
         // use.
+        CommandGene[][] nodeSetsUi = null;
+        if (uiWin!=null) {
+            ArrayList<CommandGene> terminalsAndFunctions = createTerminalsAndFunctionsFromUI();
+            terminalsAndFunctions.add(_xVariable);
+            nodeSetsUi = new CommandGene[1][terminalsAndFunctions.size()];
+            
+            for (int i=0;i<terminalsAndFunctions.size();i++) {
+            	nodeSetsUi[0][i]			= terminalsAndFunctions.get(i);
+            	}   	
+        	}
+
         CommandGene[][] nodeSets = {
-            {
-                _xVariable,                
-                new Add(config, CommandGene.DoubleClass),
-                new Multiply(config, CommandGene.DoubleClass),
-                new Abs(config,CommandGene.DoubleClass),
-                new Divide(config,CommandGene.DoubleClass),
-                new Subtract(config,CommandGene.DoubleClass),
-                new Log(config,CommandGene.DoubleClass),
-                new Pow(config,CommandGene.DoubleClass),
-                new Switch(config,CommandGene.DoubleClass),
-                new GreaterThan(config,CommandGene.DoubleClass),
-                new LesserThan(config,CommandGene.DoubleClass),
-                new Equals(config,CommandGene.DoubleClass),
-                new Constant(config, CommandGene.DoubleClass,1.0),
-                new Constant(config, CommandGene.DoubleClass,2.0),
-                new Terminal(config, CommandGene.DoubleClass, 0.0, 50, true),
-                new Terminal(config, CommandGene.DoubleClass, 0.0, 50, false)
-            }
-        };
+                {
+                    _xVariable,                
+                    new Add(config, CommandGene.DoubleClass),
+                    new Multiply(config, CommandGene.DoubleClass),
+//                    new Abs(config,CommandGene.DoubleClass),
+                    new Divide(config,CommandGene.DoubleClass),
+                    new Subtract(config,CommandGene.DoubleClass),
+//                    new Log(config,CommandGene.DoubleClass),
+                    new Pow(config,CommandGene.DoubleClass),
+                    new Switch(config,CommandGene.DoubleClass),
+                    new GreaterThan(config,CommandGene.DoubleClass),
+                    new LesserThan(config,CommandGene.DoubleClass),
+                    new Equals(config,CommandGene.DoubleClass),
+                    new Constant(config, CommandGene.DoubleClass,1.0),
+                    new Constant(config, CommandGene.DoubleClass,2.0),
+                    new Terminal(config, CommandGene.DoubleClass, 0.0, 50, true),
+                    new Terminal(config, CommandGene.DoubleClass, 0.0, 50, false)
+                }
+            };        
+                
+                
+
         GPGenotype result ;
         if (uiWin !=null) {
         		result 			= GPGenotype.randomInitialGenotype(config, types, argTypes,
-                					nodeSets, uiWin.getMaxNodes(), true);
+        				nodeSetsUi, uiWin.getMaxNodes(), true);
         		System.out.println("Adding EventLister");
         		config.getEventManager().addEventListener(GeneticEvent.
         				GENOTYPE_EVOLVED_EVENT, new GeneticEventListener() {
@@ -178,10 +212,10 @@ public class Processor  extends GPProblem {
     	epochCounter++;
     	System.out.println("Epoch:"+epochCounter);
     	gp.evolve(1);
-//    	Platform.runLater(()->uiWin.drawDataSet());
-//    	Platform.runLater(()->uiWin.drawPredictedSet());    	
-		uiWin.drawDataSet();
-		uiWin.drawPredictedSet();    	
+    	Platform.runLater(()->uiWin.drawDataSet());
+    	Platform.runLater(()->uiWin.drawPredictedSet());    	
+//		uiWin.drawDataSet();
+//		uiWin.drawPredictedSet();    	
 //    	gp.outputSolution(gp.getAllTimeBest());
     }
     	
@@ -222,6 +256,8 @@ public class Processor  extends GPProblem {
 				uiWin.appendToStatusText("Inputs= " + INPUT_1+"\nOutput= "+OUTPUT);
 			}
 	}
+	
+
     public static void main(String[] args) throws Exception {
         GPProblem problem = new Processor();
         
@@ -243,6 +279,7 @@ public class Processor  extends GPProblem {
         problem.getGPConfiguration().getVariable("X").set(-2.0);        
         System.out.println("\nExecuted -2= " + bestP.execute_double(0,new Object[0]));        
         System.out.println("Settings " + gp.getGPConfiguration().getInitStrategy());
+       
     }
 
 }
