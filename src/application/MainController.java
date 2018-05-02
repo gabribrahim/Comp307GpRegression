@@ -15,12 +15,14 @@ import javax.imageio.ImageIO;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.gp.CommandGene;
 import org.jgap.gp.GPProblem;
+import org.jgap.gp.function.ADF;
 import org.jgap.gp.function.Abs;
 import org.jgap.gp.function.Add;
 import org.jgap.gp.function.Divide;
 import org.jgap.gp.function.Equals;
 import org.jgap.gp.function.Exp;
 import org.jgap.gp.function.GreaterThan;
+import org.jgap.gp.function.If;
 import org.jgap.gp.function.LesserThan;
 import org.jgap.gp.function.Log;
 import org.jgap.gp.function.Multiply;
@@ -29,7 +31,9 @@ import org.jgap.gp.function.Subtract;
 import org.jgap.gp.function.Switch;
 import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.terminal.Constant;
+import org.jgap.gp.terminal.False;
 import org.jgap.gp.terminal.Terminal;
+import org.jgap.gp.terminal.True;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.embed.swing.SwingNode;
@@ -145,7 +149,8 @@ public class MainController {
 			myModel.config.setMutationProb(Float.parseFloat(CrossOverTF.getText()));
 			myModel.config.setCrossoverProb(Float.parseFloat(MutateTF.getText()));	
 			myModel.config.setReproductionProb(Float.parseFloat(ReproduceTF.getText()));
-			myModel.config.setNewChromsPercent(Float.parseFloat(NewChromTF.getText()));			
+			myModel.config.setNewChromsPercent(Float.parseFloat(NewChromTF.getText()));	
+//			myModel.config.setDynamizeArityProb(0.4f);
 		} catch (InvalidConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -250,6 +255,7 @@ public class MainController {
     	ArrayList<CommandGene> terminalsAndFunctions = new ArrayList<>();
     	if (AddCB.isSelected()) {
     		terminalsAndFunctions.add(new Add(config, CommandGene.DoubleClass));
+//    		terminalsAndFunctions.add(new ADF(config,1,0));
     	}
     	if (MultiplyCB.isSelected()) {
     		terminalsAndFunctions.add(new Multiply(config, CommandGene.DoubleClass));    		
@@ -273,13 +279,16 @@ public class MainController {
     		terminalsAndFunctions.add(new Abs(config, CommandGene.DoubleClass));
     	}    	
     	if (IfCB.isSelected()) {
-    		terminalsAndFunctions.add(new Switch(config, CommandGene.DoubleClass));
+    		terminalsAndFunctions.add(new Switch(config, CommandGene.BooleanClass));
+    		terminalsAndFunctions.add(new If(config, CommandGene.BooleanClass));
+    		terminalsAndFunctions.add(new True(config));
+    		terminalsAndFunctions.add(new False(config));    		
     	}    	
     	if (GreaterThanCB.isSelected()) {
-    		terminalsAndFunctions.add(new GreaterThan(config, CommandGene.DoubleClass));
+    		terminalsAndFunctions.add(new GreaterThan(config,CommandGene.BooleanClass));
     	}    	
     	if (LessThanCB.isSelected()) {
-    		terminalsAndFunctions.add(new LesserThan(config, CommandGene.DoubleClass));
+    		terminalsAndFunctions.add(new LesserThan(config, CommandGene.BooleanClass));
     	}    
     	if (EqualsCB.isSelected()) {
     		terminalsAndFunctions.add(new Equals(config, CommandGene.DoubleClass));

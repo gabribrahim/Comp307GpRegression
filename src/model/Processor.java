@@ -29,6 +29,7 @@ import org.jgap.gp.function.Pow;
 import org.jgap.gp.function.SubProgram;
 import org.jgap.gp.function.Subtract;
 import org.jgap.gp.function.Switch;
+import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
 import org.jgap.gp.impl.DeltaGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.impl.GPGenotype;
@@ -65,11 +66,13 @@ public class Processor  extends GPProblem {
         _xVariable = Variable.create(config, "X", CommandGene.DoubleClass);
         
 
-        config.setGPFitnessEvaluator(new DeltaGPFitnessEvaluator());
+        config.setGPFitnessEvaluator(new DeltaGPFitnessEvaluator()); // Lower Numbers from Fitness Function Is Better
+//        config.setGPFitnessEvaluator(new DefaultGPFitnessEvaluator()); // Higher Numbers from Fitness Function Is Better
         config.setMinInitDepth(2);
         config.setMaxInitDepth(6);
         config.setPopulationSize(1000);
         config.setMaxCrossoverDepth(6);
+        
 //        config.setEventManager(eventManager);
         config.setMutationProb((float) 0.1);
         config.setCrossoverProb((float)0.9);
